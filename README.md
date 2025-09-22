@@ -7,15 +7,15 @@
 El objetivo de esta aplicación ademas de pasar la materia es comprender como este tipo de apps nos ayudan a mantener una dieta adecuada, evitando alimentos basura y mantenerse saludable, ademas de saber como usar cosas como apis.
 
 ## Integrantes:
-1. De La Cruz Rodríguez Sergio René.    
+1. **De La Cruz Rodríguez Sergio René.**    
 - Edad: 17.  
 - Especialidad: Programación.  
 - Institución: [CETis61]
 
-![Texto alternativo](https://github.com/DeLaCruzSergioRene/nutriApp/blob/main/Sergio.200px.jpg?raw=true)
+![Foto del creador Sergio](https://github.com/DeLaCruzSergioRene/nutriApp/blob/main/Sergio.200px.jpg?raw=true)
 
 
-2. Ortega Flores Daniel Benjamín.  
+2. **Ortega Flores Daniel Benjamín.**  
 - Edad: 17.
 - Especialidad: Programación.
 - Institución: [CETis61]
