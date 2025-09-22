@@ -12,6 +12,9 @@ El objetivo de esta aplicación ademas de pasar la materia es comprender como es
 - Especialidad: Programación.  
 - Institución: [CETis61]
 
+![Texto alternativo](https://github.com/DeLaCruzSergioRene/nutriApp/blob/main/Sergio.200px.jpg?raw=true)
+
+
 2. Ortega Flores Daniel Benjamín.  
 - Edad: 17.
 - Especialidad: Programación.
