@@ -16,3 +16,5 @@ El objetivo de esta aplicación ademas de pasar la materia es comprender como es
 - Edad: 17.
 - Especialidad: Programación.
 - Institución: [CETis61]
+
+![Foto del colaborador Benjamin](https://github.com/DeLaCruzSergioRene/nutriApp/blob/main/Benjamin.200px.jpg?raw=true)
