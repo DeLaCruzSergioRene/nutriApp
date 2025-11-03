@@ -34,10 +34,10 @@ Generar conciencia sobre el consumo de los alimentos del día a día, y cómo la
 
 **Autores**:
 
-De La Cruz Rodríguez Sergio René.  
-Ortega Flores Daniel Benjamín.      
+- De La Cruz Rodríguez Sergio René.  
+- Ortega Flores Daniel Benjamín.      
 
-En la actualidad, la salud y la nutrición se han convertido en elementos centrales para el bienestar de las personas. Con el auge de la tecnología móvil, han surgido múltiples aplicaciones que facilitan el seguimiento de la alimentación, el control de calorías, la planificación de dietas y la monitorización de hábitos saludables. Estas herramientas permiten a los usuarios tener un mayor control sobre su nutrición, ofreciendo bases de datos de alimentos, registro de actividades físicas y seguimiento de nutrientes, todo desde un dispositivo móvil. Dada la gran variedad de aplicaciones disponibles, resulta esencial analizar sus funcionalidades, experiencia de usuario y modelo de negocio.
+**En la actualidad**, la salud y la nutrición se han convertido en elementos centrales para el bienestar de las personas. Con el auge de la tecnología móvil, han surgido múltiples aplicaciones que facilitan el seguimiento de la alimentación, el control de calorías, la planificación de dietas y la monitorización de hábitos saludables. Estas herramientas permiten a los usuarios tener un mayor control sobre su nutrición, ofreciendo bases de datos de alimentos, registro de actividades físicas y seguimiento de nutrientes, todo desde un dispositivo móvil. Dada la gran variedad de aplicaciones disponibles, resulta esencial analizar sus funcionalidades, experiencia de usuario y modelo de negocio.
 ## Objetivos de la investigación.
 Analizar y comparar tres aplicaciones de nutrición (MyFitnessPal, FatSecret y Cronometer) para evaluar sus funcionalidades, experiencia de usuario, modelo de negocio, fortalezas y debilidades, con el fin de identificar sus ventajas y áreas de mejora.  
 
