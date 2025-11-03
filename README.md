@@ -20,6 +20,8 @@ El objetivo de esta aplicación ademas de pasar la materia es comprender como es
 - Especialidad: Programación.
 - Institución: [CETis61]
 
+![Foto del colaborador Benjamin](https://github.com/DeLaCruzSergioRene/nutriApp/blob/main/Benjamin.200px.jpg?raw=true)
+
 ## Investigación
 
 26/10/2025
@@ -220,6 +222,6 @@ los objetivos.
 
 
 
-![Foto del colaborador Benjamin](https://github.com/DeLaCruzSergioRene/nutriApp/blob/main/Benjamin.200px.jpg?raw=true)
+
 
 ## Análisis de la Base de Datos:
