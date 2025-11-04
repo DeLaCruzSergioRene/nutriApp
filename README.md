@@ -12,7 +12,7 @@ El objetivo de esta aplicación ademas de pasar la materia es comprender como es
 - Especialidad: Programación.  
 - Institución: [CETis61]
 
-![Foto del creador Sergio](https://github.com/DeLaCruzSergioRene/nutriApp/blob/main/Sergio.200px.jpg?raw=true)
+![Foto del creador Sergio](https://github.com/DeLaCruzSergioRene/nutriApp/blob/main/static/img/developers/Sergio.200px.jpg?raw=true)
 
 
 2. **Ortega Flores Daniel Benjamín.**  
@@ -20,7 +20,7 @@ El objetivo de esta aplicación ademas de pasar la materia es comprender como es
 - Especialidad: Programación.
 - Institución: [CETis61]
 
-![Foto del colaborador Benjamin](https://github.com/DeLaCruzSergioRene/nutriApp/blob/main/Benjamin.200px.jpg?raw=true)
+![Foto del colaborador Benjamin](https://github.com/DeLaCruzSergioRene/nutriApp/blob/main/static/img/developers/Benjamin.200px.jpg?raw=true)
 
 ## Investigación
 
