@@ -1,32 +1,38 @@
 {% extends 'base.html' %}
 
 {% block contenido %}
-<h2>Análisis de Aplicaciones Existentes</h2>
+<h1 class="text-center mb-4">Análisis de Aplicaciones Existentes</h1>
 
-<table border="1" cellspacing="0" cellpadding="8" align="center">
-<tr>
-    <th>Aplicación</th>
-    <th>Funciones</th>
-    <th>Fortalezas</th>
-    <th>Debilidades</th>
-</tr>
-<tr>
-    <td>MyFitnessPal</td>
-    <td>Registro de alimentos, base de datos amplia, integración con dispositivos.</td>
-    <td>Precisión y comunidad activa.</td>
-    <td>Funciones avanzadas de pago.</td>
-</tr>
-<tr>
-    <td>FatSecret</td>
-    <td>Diario alimenticio, recetas, comunidad gratuita.</td>
-    <td>Gratis y fácil de usar.</td>
-    <td>Interfaz menos moderna.</td>
-</tr>
-<tr>
-    <td>Cronometer</td>
-    <td>Seguimiento de micronutrientes.</td>
-    <td>Muy precisa y técnica.</td>
-    <td>Compleja para principiantes.</td>
-</tr>
-</table>
+<div class="table-responsive">
+    <table class="table table-bordered table-striped text-center align-middle">
+    <thead class="table-success">
+        <tr>
+        <th>Aplicación</th>
+        <th>Funciones</th>
+        <th>Fortalezas</th>
+        <th>Debilidades</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+        <td>MyFitnessPal</td>
+        <td>Registro de alimentos, base de datos amplia, integración con dispositivos.</td>
+        <td>Precisión y comunidad activa.</td>
+        <td>Funciones avanzadas de pago.</td>
+        </tr>
+        <tr>
+        <td>FatSecret</td>
+        <td>Diario alimenticio, recetas, comunidad gratuita.</td>
+        <td>Gratis y fácil de usar.</td>
+        <td>Interfaz menos moderna.</td>
+        </tr>
+        <tr>
+        <td>Cronometer</td>
+        <td>Seguimiento de micronutrientes.</td>
+        <td>Muy precisa y técnica.</td>
+        <td>Compleja para principiantes.</td>
+        </tr>
+    </tbody>
+    </table>
+</div>
 {% endblock %}
