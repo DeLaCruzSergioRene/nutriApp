@@ -1,38 +1,40 @@
 {% extends 'base.html' %}
-
 {% block contenido %}
-<h1 class="text-center mb-4">Análisis de Aplicaciones Existentes</h1>
-
-<div class="table-responsive">
-    <table class="table table-bordered table-striped text-center align-middle">
-    <thead class="table-success">
+<h1 class="text-center text-success fw-bold mb-4">Análisis de Aplicaciones Existentes</h1>
+<div class="card shadow-sm">
+<div class="card-body">
+    <div class="table-responsive">
+    <table class="table table-bordered align-middle text-center">
+        <thead class="table-success">
         <tr>
-        <th>Aplicación</th>
-        <th>Funciones</th>
-        <th>Fortalezas</th>
-        <th>Debilidades</th>
+            <th>Aplicación</th>
+            <th>Funciones</th>
+            <th>Fortalezas</th>
+            <th>Debilidades</th>
         </tr>
-    </thead>
-    <tbody>
+        </thead>
+        <tbody>
         <tr>
-        <td>MyFitnessPal</td>
-        <td>Registro de alimentos, base de datos amplia, integración con dispositivos.</td>
-        <td>Precisión y comunidad activa.</td>
-        <td>Funciones avanzadas de pago.</td>
-        </tr>
-        <tr>
-        <td>FatSecret</td>
-        <td>Diario alimenticio, recetas, comunidad gratuita.</td>
-        <td>Gratis y fácil de usar.</td>
-        <td>Interfaz menos moderna.</td>
+            <td><strong>MyFitnessPal</strong></td>
+            <td>Registro de alimentos, base de datos amplia, integración con dispositivos.</td>
+            <td>Alta precisión, comunidad activa y conectividad con apps externas.</td>
+            <td>Muchas funciones avanzadas son de pago.</td>
         </tr>
         <tr>
-        <td>Cronometer</td>
-        <td>Seguimiento de micronutrientes.</td>
-        <td>Muy precisa y técnica.</td>
-        <td>Compleja para principiantes.</td>
+            <td><strong>FatSecret</strong></td>
+            <td>Diario alimenticio, recetas, comunidad gratuita.</td>
+            <td>Gratis, intuitiva y con recetas accesibles.</td>
+            <td>Diseño algo anticuado comparado con competidores.</td>
         </tr>
-    </tbody>
+        <tr>
+            <td><strong>Cronometer</strong></td>
+            <td>Seguimiento detallado de micronutrientes.</td>
+            <td>Altamente precisa y con métricas científicas.</td>
+            <td>Poco amigable para usuarios principiantes.</td>
+        </tr>
+        </tbody>
     </table>
+    </div>
+</div>
 </div>
 {% endblock %}
