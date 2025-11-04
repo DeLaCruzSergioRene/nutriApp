@@ -27,7 +27,7 @@ El objetivo de esta aplicación ademas de pasar la materia es comprender como es
 26/10/2025
 
 # APPS NUTRICIONALES, ¿Qué son? Y: Análisis de un par de ellas.
- <img width="520" height="619" alt="image" src="https://github.com/user-attachments/assets/ab04c8df-cf64-4d83-a9bc-ee76bdcf0c96" />
+ <img width="520" height="619" alt="image" src="https://www.consumer.es/app/uploads/2025/04/aplicaciones-nutricionales.jpg" />
  
 Generar conciencia sobre el consumo de los alimentos del día a día, y cómo la alimentación no es solamente comer por hacerlo, sino que está ligada a muchos otros factores y a nuestra salud en general.
 
