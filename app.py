@@ -1,10 +1,14 @@
-from flask import Flask, render_template, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 
 app = Flask(__name__)
 
 @app.route('/')
-def inicio():
-    return render_template('inicio.html')
+def index():
+    return render_template('index.html')
+
+@app.route('/registro')
+def registro():
+    return render_template('registro.html')
 
 @app.route('/apps')
 def apps():
@@ -17,6 +21,39 @@ def encuesta():
 @app.route('/conclusiones')
 def conclusiones():
     return render_template('conclusiones.html')
+
+@app.route("/registrame", methods=["GET", "POST"])
+def registrame():
+    error = None
+    if request.method == "POST":
+        nombre = request.form["nombre"]
+        apellidos = request.form["apellidos"]
+        dia = request.form["dia"]
+        mes = request.form["mes"]
+        anio = request.form["anio"]
+        actividad = request.form["actividad"]
+        genero = request.form["genero"]
+        email = request.form["email"]
+        contrasena = request.form["contrasena"]
+        confirmar_contrasena = request.form["confirmar_contrasena"]
+        
+        if len(nombre) < 3:
+            flash("El nombre debe tener al menos 3 caracteres.")
+            return render_template("registro", nombre=nombre)
+        
+        if len(apellidos) < 3:
+            flash("No puede haber menos de 3 caracteres.")
+            return render_template("registro", apellidos=apellidos) 
+        
+        if contrasena != confirmar_contrasena:
+            error = "La contraseña no coincide."
+            
+        if error != None:
+            flash(error)
+            return render_template("registro.html")
+        else:
+            flash(f"¡Registro exitoso para el usuario: ¡{nombre}!")
+            return render_template("index.html")
 
 if __name__ == '__main__':
     app.run(debug=True)
