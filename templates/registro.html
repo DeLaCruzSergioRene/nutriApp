@@ -175,10 +175,10 @@
 
             <div class="mb-3">
                 <label for="contrasena_confirm" class="form-label">Confirmar Contraseña:</label>
-                <input type="password" name="confirmar_contrasena" value = "{{ request.form.get('confirmar_contrasena', '')}}" required minlenght="3" maxlenght="100" placeholder="Confirmar contraseña"> 
+                <input type="password" class= "form-control" id="confirmar_contrasena" name="confirmar_contrasena" value = "{{ request.form.get('confirmar_contrasena', '')}}" required minlenght="3" maxlenght="100" placeholder="Confirmar contraseña"> 
             </div>
 
-            <button type="submit" class="btn btn-registro w-100 mb-3">Registrarte</button>
+            <button type="submit" class="btn btn-registro w-100 mb-3 bg-primary text-white">Registrarte</button>
             </form>
         </div>
 {% endblock %}
