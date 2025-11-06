@@ -53,7 +53,7 @@ def registrame():
             return render_template("registro.html", nombre=nombre)
         
         if len(apellidos) < 3:
-            flash("No puede haber menos de 3 caracteres.")
+            flash("No puede haber menos de 3 caracteres en los apellidos.")
             return render_template("registro.html", apellidos=apellidos) 
         
         if contrasena != confirmar_contrasena:
