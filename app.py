@@ -50,11 +50,11 @@ def registrame():
         
         if len(nombre) < 3:
             flash("El nombre debe tener al menos 3 caracteres.")
-            return render_template("registro", nombre=nombre)
+            return render_template("registro.html", nombre=nombre)
         
         if len(apellidos) < 3:
             flash("No puede haber menos de 3 caracteres.")
-            return render_template("registro", apellidos=apellidos) 
+            return render_template("registro.html", apellidos=apellidos) 
         
         if contrasena != confirmar_contrasena:
             error = "La contraseña no coincide."
