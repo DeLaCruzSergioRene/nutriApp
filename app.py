@@ -14,9 +14,9 @@ def registro():
 def apps():
     return render_template('apps.html')
 
-@app.route('/encuesta')
-def encuesta():
-    return render_template('encuesta.html')
+@app.route('/informacion')
+def informacion():
+    return render_template('informacion.html')
 
 @app.route('/conclusiones')
 def conclusiones():
