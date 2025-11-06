@@ -22,6 +22,15 @@ def encuesta():
 def conclusiones():
     return render_template('conclusiones.html')
 
+@app.route('/abo')
+def nosotros():
+    return render_template('acercaDe.html')
+
+@app.route('/dat')
+def datos():
+    return render_template('usoDatos.html')
+
+
 @app.route("/registrame", methods=["GET", "POST"])
 def registrame():
     error = None
