@@ -96,5 +96,9 @@ def cerrar_sesion():
     flash("Has cerrado sesión exitosamente.")
     return redirect(url_for("login"))
 
+@app.route("/cue")
+def cuenta(): 
+    return render_template("cuentaUsuario.html")
+
 if __name__ == '__main__':
     app.run(debug=True)
