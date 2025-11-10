@@ -95,8 +95,8 @@ def cerrar_sesion():
     session.clear()  
     return redirect(url_for("login"))
 
-@app.route("/cue")
-def cuenta(): 
+@app.route("/cue", methods=["GET"])
+def cuenta():
     return render_template("cuentaUsuario.html")
 
 if __name__ == '__main__':
