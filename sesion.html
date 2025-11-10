@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Inicio De Sesion{% endblock %}
+{% block content %}
+
+    <div class="container">
+        <h2 class="text-center mb-4">Iniciar Sesion.</h2> 
+        
+        <div class="container mt-4">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{('danger' if category == 'error' else 'danger')}} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+    </div>
+        
+        <form method="POST" action="{{ url_for('login') }}" class="formulario-registro">
+            
+            <div class="mb-3">
+                <label for="email" class="form-label">Correo Electrónico:</label>
+                <input type="email" class="form-control" id="email" name="email" value="{{ request.form.get('email', '') }}" required minlenght="3" maxlenght="100" placeholder="Numero de celular o correo electrónico">
+            </div>
+
+            <div class="mb-3">
+                <label for="contrasena" class="form-label">Contraseña:</label>
+                <input type="password" class="form-control" id="contrasena" name="contrasena" value = "{{ request.form.get('contrasena', '')}}" required minlenght="3" maxlenght="100" placeholder="Contraseña nueva">
+            </div>
+
+            <div class="mb-3">
+                <label for="contrasena_confirm" class="form-label">Confirmar Contraseña:</label>
+                <input type="password" name="confirmar_contrasena" value = "{{ request.form.get('confirmar_contrasena', '')}}" required minlenght="3" maxlenght="100" placeholder="Confirmar contraseña"> 
+            </div>
+
+            <button type="submit" class="btn btn-registro w-100 mb-3">Iniciar sesión</button>
+            </form>
+        </div>
+{% endblock %}

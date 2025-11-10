@@ -12,6 +12,10 @@ def index():
 def registro():
     return render_template('registro.html')
 
+@app.route('/sesion')
+def sesion():
+    return render_template('sesion.html')
+
 @app.route('/apps')
 def apps():
     return render_template('apps.html')
@@ -65,6 +69,32 @@ def registrame():
         else:
             flash(f"¡Registro exitoso para el usuario: ¡{nombre}!")
             return render_template("index.html")
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    error = None
+    if request.method == "POST":
+        email = request.form["email"]
+        contrasena = request.form["contrasena"]
+        confirmar_contrasena = request.form["confirmar_contrasena"]
+        
+        if contrasena != confirmar_contrasena:
+            error = "La contraseña no coincide."
+            
+        if error != None:
+            flash(error)
+            return render_template("sesion.html")
+        else:
+            session["email"] = email
+            flash(f"¡Registro exitoso para el usuario: ¡{email}!")
+            return redirect(url_for("index"))
+    return render_template("sesion.html")
+
+@app.route("/cerrar_sesion")
+def cerrar_sesion():
+    session.clear()  
+    flash("Has cerrado sesión exitosamente.")
+    return redirect(url_for("login"))
 
 if __name__ == '__main__':
     app.run(debug=True)
