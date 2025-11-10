@@ -93,7 +93,6 @@ def login():
 @app.route("/cerrar_sesion")
 def cerrar_sesion():
     session.clear()  
-    flash("Has cerrado sesión exitosamente.")
     return redirect(url_for("login"))
 
 @app.route("/cue")
