@@ -17,10 +17,6 @@ def registro():
 def sesion():
     return render_template('sesion.html')
 
-@app.route('/apps')
-def apps():
-    return render_template('apps.html')
-
 @app.route('/informacion')
 def informacion():
     return render_template('informacion.html')
