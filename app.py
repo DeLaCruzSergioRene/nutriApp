@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash , requests
+from flask import Flask, render_template, request, redirect, url_for, session, flash 
+import requests
 
 app = Flask(__name__)
 
@@ -24,9 +25,25 @@ def apps():
 def informacion():
     return render_template('informacion.html')
 
-@app.route('/conclusiones')
-def conclusiones():
-    return render_template('conclusiones.html')
+@app.route('/basal')
+def calculadora_basal():
+    return render_template('calculadora_basal.html')
+
+@app.route('/gasto')
+def calculadora_gasto():
+    return render_template('calculadora_gasto.html')
+
+@app.route('/ideal')
+def calculadora_ideal():
+    return render_template('calculadora_ideal.html')
+
+@app.route('/masa')
+def calculadora_imc():
+    return render_template('informacion.html')
+
+@app.route('/macro')
+def calculadora_macro():
+    return render_template('calculadora_macro.html')
 
 @app.route('/abo')
 def nosotros():
