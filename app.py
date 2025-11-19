@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-from flask import Flask, render_template, request, redirect, url_for, session, flash
-=======
 from flask import Flask, render_template, request, redirect, url_for, session, flash 
->>>>>>> 0ee0fbb66d6c895af586a23ab0718a1907b5c6a1
 import requests
 
 app = Flask(__name__)
@@ -20,10 +16,6 @@ def registro():
 @app.route('/sesion')
 def sesion():
     return render_template('sesion.html')
-
-@app.route('/apps')
-def apps():
-    return render_template('apps.html')
 
 @app.route('/informacion')
 def informacion():
