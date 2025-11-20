@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+
+{% block contenido %}
+
+<div class="card">
+  <img src="..." class="card-img-top" alt="...">
+  <div class="card-body">
+    <h5 class="card-title">Indice de masa corporal</h5>
+    <p class="card-text">Introduzca sus datos.</p>
+    <form method="POST" action="{{ url_for('imc_calcular') }}" class="formulario-imc">
+
+        <input type="text" name="peso" id="peso" value = "{{ request.form.get('peso', '')}}" required placeholder="Peso(kgs)">
+        <input type="text" name="estutura" id="estatura" value = "{{ request.form.get('estatura', '')}}" required placeholder="Estatura(cms)">
+        <button type="submit">Calcular</button>
+
+
+    </form>
+  </div>
+</div>
+
+
+{% endblock  %}
+    

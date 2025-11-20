@@ -111,5 +111,10 @@ def cerrar_sesion():
 def cuenta():
     return render_template("cuentaUsuario.html")
 
+@app.route("/imc_calcular", methods=["POST"])
+def imc_calcular():
+    return render_template("calculadora_imc.html")
+
+
 if __name__ == '__main__':
     app.run(debug=True)
