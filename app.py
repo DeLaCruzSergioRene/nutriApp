@@ -35,7 +35,7 @@ def calculadora_ideal():
 
 @app.route('/masa')
 def calculadora_imc():
-    return render_template('informacion.html')
+    return render_template('calculadora_imc.html')
 
 @app.route('/macro')
 def calculadora_macro():
