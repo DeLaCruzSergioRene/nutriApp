@@ -89,7 +89,7 @@ avanzadas.
 - Planes de dieta personalizados basados en objetivos individuales.
 - Integración con dispositivos de seguimiento de actividad física.
 - Comunidad en línea para apoyo y motivación.
- 
+
 ### FatSecret.  
 
 **Funcionalidades principales:**
@@ -122,7 +122,7 @@ avanzadas.
 - Comunidad en línea para apoyo social.
 - Informes detallados sobre la ingesta de nutrientes.
 - Función de seguimiento de recetas caseras.
- 
+
 ### Cronometer
 
 **Funcionalidades principales:**
@@ -187,7 +187,7 @@ información o la experiencia de uso.
 que los participantes expresaran ideas o funciones deseadas en futuras aplicaciones.
 #### Metodología:
 La encuesta se realizó de forma en línea mediante un formulario digital. Participaron 15 personas de diferentes edades, todas con interés en mejorar su alimentación o su condición física. Las respuestas fueron recopiladas y analizadas de manera descriptiva, identificando las tendencias más relevantes en cuanto a preferencias, uso y expectativas.
- 
+
  <img width="555" height="689" alt="image" src="https://github.com/user-attachments/assets/2984032e-0be4-4fe3-9af2-609173d2dd30" />
  <img width="492" height="612" alt="image" src="https://github.com/user-attachments/assets/2cd03bb3-a4c7-40cb-88a6-5e05a9c3e701" />
  <img width="1119" height="450" alt="image" src="https://github.com/user-attachments/assets/07b68744-a520-4239-8206-ebf5538e4d3e" />
@@ -196,12 +196,12 @@ La encuesta se realizó de forma en línea mediante un formulario digital. Parti
  <img width="1104" height="1270" alt="image" src="https://github.com/user-attachments/assets/f42f6691-8847-498c-ae28-8dbaffbe8aa0" />
  <img width="1175" height="1236" alt="image" src="https://github.com/user-attachments/assets/f99a4277-dd7e-4008-a002-d2378ced2407" />
  <img width="1175" height="602" alt="image" src="https://github.com/user-attachments/assets/d75f4dd5-da8d-4888-a3a6-07f08d8548b1" />
- 
+
 - En general la gente no ha oído hablar de estas aplicaciones y que no tienen mucho que decir.
 - La gente busca recetas fáciles y con cosas fáciles de
 conseguir.
 - La gente no ha oído hablar ni usado estas aplicaciones.
- 
+
 ##### Síntesis de aprendizajes:
 A lo largo del análisis se observó que las aplicaciones de nutrición actuales ofrecen múltiples herramientas para mejorar los hábitos alimenticios y el control de la salud. Sin embargo, cada una presenta diferencias en su enfoque, accesibilidad y nivel de detalle. MyFitnessPal destaca por su amplia base de datos y su integración con dispositivos y otras apps de ejercicio, lo que la hace muy completa para usuarios activos. FatSecret, por su parte, sobresale por ofrecer funciones completas sin costo, además de una comunidad participativa que brinda apoyo y motivación. Cronometer se diferencia por su precisión en el seguimiento de nutrientes, ideal para usuarios que buscan un control más técnico o profesional de su alimentación.
 
@@ -219,9 +219,5 @@ Con base en el análisis y las preferencias identificadas en la encuesta, se pro
 3.	Sistema de seguimiento inteligente: implementar recordatorios automáticos, análisis de progreso y sugerencias personalizadas según
 los objetivos.
 4.	Enfoque motivacional y social: incluir retos, logros y comunidades para compartir experiencias de forma positiva.
-
-
-
-
 
 ## Análisis de la Base de Datos:

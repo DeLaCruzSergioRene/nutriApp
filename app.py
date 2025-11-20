@@ -49,7 +49,6 @@ def nosotros():
 def datos():
     return render_template('usoDatos.html')
 
-
 @app.route("/registrame", methods=["GET", "POST"])
 def registrame():
     error = None
