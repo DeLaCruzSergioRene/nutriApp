@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Calculadora de Macronutrientes{% endblock %}
+{% block content %}
+<h1 class="mb-4 text-center bg-secondary">Calculadora de Macronutrientes</h1>
+<form action="{{ url_for('calcular') }}" method="POST">
+    <div class="mb-3">
+        <label for="alimento" class="form-label">Nombre del alimento:</label>
+        <input type="text" class="form-control" id="alimento" name="alimento" required>
+    </div>
+    <div class="mb-3">
+        <label for="grasas" class="form-label">Grasas (g):</label>
+        <input type="number" step="0.1" class="form-control" id="grasas" name="grasas" required>
+    </div>
+    <div class="mb-3">
+        <label for="proteinas" class="form-label">Proteínas (g):</label>
+        <input type="number" step="0.1" class="form-control" id="proteinas" name="proteinas" required>
+    </div>
+    <div class="mb-3">
+        <label for="carbohidratos" class="form-label">Carbohídratos (g):</label>
+        <input type="number" step="0.1" class="form-control" id="carbohidratos" name="carbohidratos" required>
+    </div>
+    <button type="submit" class="btn btn-primary w-100 py-2">Clasificar</button>
+</form>
+
+{% if alimentos %}
+    <h2 class="mt-4">Alimentos Clasificados</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Alimento</th>
+                <th>Grasas (g)</th>
+                <th>Proteínas (g)</th>
+                <th>Carbohidratos (g)</th>
+                <th>Total Calorías</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for alimento in alimentos %}
+                <tr>
+                <td>{{ alimento.alimento }}</td>
+                <td>{{ alimento.grasas }}</td>
+                <td>{{ alimento.proteinas }}</td>
+                <td>{{ alimento.carbohidratos }}</td>
+                <td>{{ alimento.calorias_totales }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+{% endblock %}
