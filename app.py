@@ -37,9 +37,25 @@ def calculadora_ideal():
 def calculadora_imc():
     return render_template('calculadora_imc.html')
 
-@app.route('/macro')
+@app.route('/macro', methods=["GET"])
 def calculadora_macro():
     return render_template('calculadora_macro.html')
+
+@app.route('/calcular_macro', methods=["POST"])
+def calcular_macro():
+    alimento = request.form["alimento"]
+    grasas = float(request.form["grasas"])
+    proteinas = float(request.form["proteinas"])
+    carbohidratos = float(request.form["carbohidratos"])
+
+    calorias_totales = (grasas * 9) + (proteinas * 4) + (carbohidratos * 4)
+    resultado = {
+        "alimento": alimento,
+        "grasas": grasas,
+        "proteinas": proteinas,
+        "carbohidratos": carbohidratos,
+        "calorias_totales": round(calorias_totales, 2)
+    }
 
 @app.route('/abo')
 def nosotros():
