@@ -1,49 +1,54 @@
 {% extends 'base.html' %}
 {% block title %}Calculadora de Macronutrientes{% endblock %}
-{% block content %}
-<h1 class="mb-4 text-center bg-secondary">Calculadora de Macronutrientes</h1>
-<form action="{{ url_for('calcular') }}" method="POST">
+{% block contenido %}
+
+<h1 class="mb-4 text-center bg-secondary text-white p-2">Calculadora de Macronutrientes</h1>
+<form action="{{ url_for('calcular_macro') }}" method="POST">
     <div class="mb-3">
-        <label for="alimento" class="form-label">Nombre del alimento:</label>
-        <input type="text" class="form-control" id="alimento" name="alimento" required>
+        <label class="form-label">Nombre del alimento:</label>
+        <input type="text" class="form-control" name="alimento" required>
     </div>
     <div class="mb-3">
-        <label for="grasas" class="form-label">Grasas (g):</label>
-        <input type="number" step="0.1" class="form-control" id="grasas" name="grasas" required>
+        <label class="form-label">Grasas (g):</label>
+        <input type="number" step="0.1" class="form-control" name="grasas" required>
     </div>
     <div class="mb-3">
-        <label for="proteinas" class="form-label">Proteínas (g):</label>
-        <input type="number" step="0.1" class="form-control" id="proteinas" name="proteinas" required>
+        <label class="form-label">Proteínas (g):</label>
+        <input type="number" step="0.1" class="form-control" name="proteinas" required>
     </div>
     <div class="mb-3">
-        <label for="carbohidratos" class="form-label">Carbohídratos (g):</label>
-        <input type="number" step="0.1" class="form-control" id="carbohidratos" name="carbohidratos" required>
+        <label class="form-label">Carbohidratos (g):</label>
+        <input type="number" step="0.1" class="form-control" name="carbohidratos" required>
     </div>
-    <button type="submit" class="btn btn-primary w-100 py-2">Clasificar</button>
+    <button type="submit" class="btn btn-primary w-100 py-2">Calcular</button>
 </form>
 
-{% if alimentos %}
-    <h2 class="mt-4">Alimentos Clasificados</h2>
-    <table class="table table-striped">
-        <thead>
+{% if resultado %}
+    <h2 class="mt-4">Resultado</h2>
+    <table class="table table-bordered">
+        <tbody>
             <tr>
                 <th>Alimento</th>
-                <th>Grasas (g)</th>
-                <th>Proteínas (g)</th>
-                <th>Carbohidratos (g)</th>
-                <th>Total Calorías</th>
+                <td>{{ resultado.alimento }}</td>
             </tr>
-        </thead>
-        <tbody>
-            {% for alimento in alimentos %}
-                <tr>
-                <td>{{ alimento.alimento }}</td>
-                <td>{{ alimento.grasas }}</td>
-                <td>{{ alimento.proteinas }}</td>
-                <td>{{ alimento.carbohidratos }}</td>
-                <td>{{ alimento.calorias_totales }}</td>
-                </tr>
-            {% endfor %}
+            <tr>
+                <th>Grasas (g)</th>
+                <td>{{ resultado.grasas }}</td>
+            </tr>
+            <tr>
+                <th>Proteínas (g)</th>
+                <td>{{ resultado.proteinas }}</td>
+            </tr>
+            <tr>
+                <th>Carbohidratos (g)</th>
+                <td>{{ resultado.carbohidratos }}</td>
+            </tr>
+            <tr>
+                <th>Total Calorías</th>
+                <td><strong>{{ resultado.calorias_totales }}</strong></td>
+            </tr>
+        </tbody>
+    </table>
         </tbody>
     </table>
 {% endif %}
