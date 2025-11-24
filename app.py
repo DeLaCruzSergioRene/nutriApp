@@ -51,7 +51,6 @@ def calculadora_gct():
         tmb = float(request.form["tmb"])
         factor = float(request.form["factor"])
         resultado = round(tmb * factor, 2)
-
     return render_template("calculadora_gct.html", resultado=resultado)
 
 @app.route('/ideal')
@@ -143,7 +142,6 @@ def login():
         email = request.form["email"]
         contrasena = request.form["contrasena"]
         confirmar_contrasena = request.form["confirmar_contrasena"]
-        
         if contrasena != confirmar_contrasena:
             error = "La contraseña no coincide."
             
@@ -168,7 +166,6 @@ def cuenta():
 @app.route("/imc_calcular", methods=["POST"])
 def imc_calcular():
     return render_template("calculadora_imc.html")
-
 
 if __name__ == '__main__':
     app.run(debug=True)
