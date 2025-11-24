@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Calculadora GCT{% endblock %}
+{% block contenido %}
+
+<h1 class="mb-4 text-center bg-secondary text-white p-2">Calculadora de Gasto Calórico Total (GCT)</h1>
+<form action="{{ url_for('calculadora_gct') }}" method="POST">
+    <div class="mb-3">
+        <label class="form-label">TMB (kcal):</label>
+        <input type="number" step="0.1" class="form-control" name="tmb" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Nivel de actividad:</label>
+        <select name="factor" class="form-select" required>
+            <option value="1.2">Sedentario (1.2)</option>
+            <option value="1.375">Ligero (1.375)</option>
+            <option value="1.55">Moderado (1.55)</option>
+            <option value="1.725">Intenso (1.725)</option>
+            <option value="1.9">Muy intenso (1.9)</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary w-100 py-2">Calcular</button>
+</form>
+
+{% if resultado %}
+    <h2 class="mt-4">Resultado</h2>
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th>Gasto Calórico Total</th>
+                <td><strong>{{ resultado }} kcal/día</strong></td>
+            </tr>
+        </tbody>
+    </table>
+{% endif %}
+{% endblock %}

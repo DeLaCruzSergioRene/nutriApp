@@ -25,13 +25,51 @@ def informacion():
 def calculadora_basal():
     return render_template('calculadora_basal.html')
 
+@app.route('/tmb', methods=["GET", "POST"])
+def calcular_tmb():
+    resultado = None
+    if request.method == "POST":
+        genero = request.form["genero"]
+        peso = float(request.form["peso"])
+        altura = float(request.form["altura"])
+        edad = int(request.form["edad"])
+        if genero == "hombre":
+            resultado = 10 * peso + 6.25 * altura - 5 * edad + 5
+        else:
+            resultado = 10 * peso + 6.25 * altura - 5 * edad - 161
+        resultado = round(resultado, 2)
+    return render_template("calculadora_tmb.html", resultado=resultado)
+
 @app.route('/gasto')
 def calculadora_gasto():
     return render_template('calculadora_gasto.html')
 
+@app.route('/gct', methods=["GET", "POST"])
+def calculadora_gct():
+    resultado = None
+    if request.method == "POST":
+        tmb = float(request.form["tmb"])
+        factor = float(request.form["factor"])
+        resultado = round(tmb * factor, 2)
+
+    return render_template("calculadora_gct.html", resultado=resultado)
+
 @app.route('/ideal')
 def calculadora_ideal():
     return render_template('calculadora_ideal.html')
+
+@app.route('/idea', methods=["GET", "POST"])
+def calculadora_idea():
+    resultado = None
+    if request.method == "POST":
+        genero = request.form["genero"]
+        altura = float(request.form["altura"])
+        if genero == "hombre":
+            resultado = 50 + 0.91 * (altura - 152)
+        else:
+            resultado = 45.5 + 0.91 * (altura - 152)
+        resultado = round(resultado, 2)
+    return render_template("calculadora_ideal.html", resultado=resultado)
 
 @app.route('/masa')
 def calculadora_imc():
