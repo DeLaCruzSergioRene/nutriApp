@@ -51,7 +51,7 @@ def calculadora_gct():
         tmb = float(request.form["tmb"])
         factor = float(request.form["factor"])
         resultado = round(tmb * factor, 2)
-    return render_template("calculadora_gct.html", resultado=resultado)
+    return render_template("calculadora_gasto.html", resultado=resultado)
 
 @app.route('/ideal')
 def calculadora_ideal():
@@ -93,6 +93,8 @@ def calcular_macro():
         "carbohidratos": carbohidratos,
         "calorias_totales": round(calorias_totales, 2)
     }
+    
+    return render_template("calculadora_macro.html", resultado=resultado)
 
 @app.route('/abo')
 def nosotros():
