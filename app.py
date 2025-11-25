@@ -80,13 +80,13 @@ def calculadora_idea():
         resultado = round(resultado, 2)
     return render_template("calculadora_ideal.html", resultado=resultado)
 
+@app.route('/macro')
+def calculadora_macro():
+    return render_template('calculadora_macro.html')
+
 @app.route('/masa')
 def calculadora_imc():
     return render_template('calculadora_imc.html')
-
-@app.route('/macro', methods=["GET"])
-def calculadora_macro():
-    return render_template('calculadora_macro.html')
 
 @app.route('/calcular_macro', methods=["POST"])
 def calcular_macro():
