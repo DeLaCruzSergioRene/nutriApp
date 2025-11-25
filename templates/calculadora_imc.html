@@ -1,24 +1,31 @@
 {% extends 'base.html' %}
-
-
+{% block title %}Calculadora de Macronutrientes{% endblock %}
 {% block contenido %}
 
-<div class="card">
-  <img src="..." class="card-img-top" alt="...">
-  <div class="card-body">
-    <h5 class="card-title">Indice de masa corporal</h5>
-    <p class="card-text">Introduzca sus datos.</p>
-    <form method="POST" action="{{ url_for('imc_calcular') }}" class="formulario-imc">
+<h1 class="mb-4 text-center bg-secondary text-white p-2">Indice De Masa Corporal</h1>
+<form action="{{ url_for('calcular_macro') }}" method="POST">
+    <div class="mb-3">
+        <label class="form-label">Peso:</label>
+        <input type="number" step="0.1" class="form-control" name="peso" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Estatura:</label>
+        <input type="number" step="0.1" class="form-control" name="estatura" required>
+    </div>
+    <button type="submit" class="btn btn-primary w-100 py-2">Calcular</button>
+</form>
 
-        <input type="text" name="peso" id="peso" value = "{{ request.form.get('peso', '')}}" required placeholder="Peso(kgs)">
-        <input type="text" name="estutura" id="estatura" value = "{{ request.form.get('estatura', '')}}" required placeholder="Estatura(cms)">
-        <button type="submit">Calcular</button>
-
-
-    </form>
-  </div>
-</div>
-
-
-{% endblock  %}
-    
+{% if resultado %}
+    <h2 class="mt-4">imc</h2>
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th></th>
+                <td><strong>{{ resultado }}</strong></td>
+            </tr>
+        </tbody>
+    </table>
+        </tbody>
+    </table>
+{% endif %}
+{% endblock %}

@@ -1,6 +1,16 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash 
 import requests
 
+# app.config['MYSQL_HOST'] = 'localhost'
+# app.config['MYSQL_USER'] = 'root'
+# app.config['MYSQL_PASSWORD'] = ''
+#  app.config['MYSQL_DB'] = 'prueba'
+# app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+
+
+# mysql = MySQL(app)
+
+
 app = Flask(__name__)
 
 app.config["SECRET_KEY"] = "una_clave_secreta_muy_larga_y_dificil_de_adivinar"
@@ -167,7 +177,14 @@ def cuenta():
 
 @app.route("/imc_calcular", methods=["POST"])
 def imc_calcular():
-    return render_template("calculadora_imc.html")
+    resultado = None
+    peso = float(request.form["peso"])
+    estatura = float(request.form["estatura"])
+    if request.method == "POST":
+        resultado = peso / estatura
+        resultado = (resultado)
+        return render_template("calculadora_imc.html", resultado=resultado)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
