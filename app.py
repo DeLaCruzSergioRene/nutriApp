@@ -48,7 +48,7 @@ def calcular_tmb():
         else:
             resultado = 10 * peso + 6.25 * altura - 5 * edad - 161
         resultado = round(resultado, 2)
-    return render_template("calculadora_tmb.html", resultado=resultado)
+    return render_template("calculadora_basal.html", resultado=resultado)
 
 @app.route('/gasto')
 def calculadora_gasto():
