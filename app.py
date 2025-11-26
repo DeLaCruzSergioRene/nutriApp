@@ -1,23 +1,22 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 import requests
-# from flask import Flask mysqldb, MySQL
-from werkzeug.security import generate_password_hash
-import re
 
-app = Flask(__name__)
+# app.config['MYSQL_HOST'] = 'localhost'
+# app.config['MYSQL_USER'] = 'root'
+# app.config['MYSQL_PASSWORD'] = ''
+#  app.config['MYSQL_DB'] = 'prueba'
+# app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'prueba'
-#app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
-app.config["SECRET_KEY"] = "una_clave_secreta_muy_larga_y_dificil_de_adivinar"
-
-mysql = MySQL(app)
+# mysql = MySQL(app)
 
 USDA_API_URL = "https://api.nal.usda.gov/fdc/v1/foods/search"
 USDA_API_KEY = "rfTd35c18oR2TY0uJOMRZpk6kPH9TsHy8Id90E3k" 
+
+
+app = Flask(__name__)
+
+app.config["SECRET_KEY"] = "una_clave_secreta_muy_larga_y_dificil_de_adivinar"
 
 @app.route('/')
 def index():
@@ -192,7 +191,6 @@ def imc_calcular():
 @app.route("/search")
 def search():
     return render_template("buscar.html")
-    
 
 @app.route("/search", methods=["POST"])
 def search_food():
