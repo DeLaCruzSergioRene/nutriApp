@@ -23,9 +23,6 @@ def index():
 def registro():
     return render_template('registro.html')
 
-registrar_usuario
-
-
 @app.route('/sesion')
 def sesion():
     return render_template('sesion.html')
