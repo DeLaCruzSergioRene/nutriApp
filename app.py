@@ -7,7 +7,6 @@ import requests
 #  app.config['MYSQL_DB'] = 'prueba'
 # app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
-
 # mysql = MySQL(app)
 
 USDA_API_URL = "https://api.nal.usda.gov/fdc/v1/foods/search"
