@@ -185,6 +185,53 @@ def imc_calcular():
         resultado = (resultado)
         return render_template("calculadora_imc.html", resultado=resultado)
 
+@app.route("/search", methods=["POST"])
+def search_food():
+    query = request.form.get("food_name", "").strip()
+    
+    if not query:
+        flash("Por favor ingresa un alimento para buscar.")
+        return redirect(url_for("index"))
+    
+    try:
+        params = {
+            "api_key": USDA_API_KEY,
+            "query": query,
+            "pageSize": 3  
+        }
+
+        response = requests.get(USDA_API_URL, params=params)
+        
+        if response.status_code == 200:
+            data = response.json()
+            foods = data.get("foods", [])
+            
+            if not foods:
+                flash(f"No se encontraron resultados para '{query}'.", "error")
+                return redirect(url_for("index"))
+
+            results = []
+            for f in foods:
+                nutrients = {n["nutrientName"]: n.get("value") for n in f.get("foodNutrients", [])}
+                
+                results.append({
+                    "description": f.get("description", "Sin descripción"),
+                    "brand": f.get("brandName", "N/A"),
+                    "calories": nutrients.get("Energy", "N/A"),
+                    "protein": nutrients.get("Protein", "N/A"),
+                    "carbs": nutrients.get("Carbohydrate, by difference", "N/A"),
+                    "fat": nutrients.get("Total lipid (fat)", "N/A")
+                })
+            
+            return render_template("food_results.html", query=query, foods=results)
+        else:
+            flash(f"Error en la búsqueda: {response.status_code}", "error")
+            return redirect(url_for("index"))
+
+    except requests.exceptions.RequestException as e:
+        flash(f"Error al conectarse con la API: {e}", "error")
+        return redirect(url_for("index"))
+
 
 if __name__ == '__main__':
     app.run(debug=True)
