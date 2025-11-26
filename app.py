@@ -237,6 +237,5 @@ def search_food():
         flash(f"Error al conectarse con la API: {e}", "error")
         return redirect(url_for("index"))
 
-
 if __name__ == '__main__':
     app.run(debug=True)
