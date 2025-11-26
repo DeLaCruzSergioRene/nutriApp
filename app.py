@@ -10,6 +10,9 @@ import requests
 
 # mysql = MySQL(app)
 
+USDA_API_URL = "https://api.nal.usda.gov/fdc/v1/foods/search"
+USDA_API_KEY = "rfTd35c18oR2TY0uJOMRZpk6kPH9TsHy8Id90E3k" 
+
 
 app = Flask(__name__)
 
@@ -184,6 +187,11 @@ def imc_calcular():
         resultado = peso / estatura
         resultado = (resultado)
         return render_template("calculadora_imc.html", resultado=resultado)
+    
+@app.route("/search")
+def search():
+    return render_template("buscar.html")
+    
 
 @app.route("/search", methods=["POST"])
 def search_food():
@@ -223,7 +231,7 @@ def search_food():
                     "fat": nutrients.get("Total lipid (fat)", "N/A")
                 })
             
-            return render_template("food_results.html", query=query, foods=results)
+            return render_template("buscar_re.html", query=query, foods=results)
         else:
             flash(f"Error en la búsqueda: {response.status_code}", "error")
             return redirect(url_for("index"))
