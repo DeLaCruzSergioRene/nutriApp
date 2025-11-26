@@ -13,7 +13,6 @@ import requests
 USDA_API_URL = "https://api.nal.usda.gov/fdc/v1/foods/search"
 USDA_API_KEY = "rfTd35c18oR2TY0uJOMRZpk6kPH9TsHy8Id90E3k" 
 
-
 app = Flask(__name__)
 
 app.config["SECRET_KEY"] = "una_clave_secreta_muy_larga_y_dificil_de_adivinar"
