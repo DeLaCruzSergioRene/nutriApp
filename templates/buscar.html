@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Buscar{% endblock %}
+{% block contenido %}
+<div class="container my-5">
+        <h1 class="text-center mb-4">Buscar información nutricional</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alert alert-warning">
+                    <ul class="mb-0">
+                        {% for category, msg in messages %}
+                            <li>{{ msg }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('search_food') }}" method="post">
+            <div class="mb-3">
+                <label for="food_name" class="form-label">Nombre del alimento</label>
+                <input type="text" class="form-control" id="food_name" name="food_name" placeholder="Ejemplo: apple" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Buscar</button>
+        </form>
+    </div>
