@@ -189,7 +189,6 @@ def imc_calcular():
 @app.route("/search")
 def search():
     return render_template("buscar.html")
-    
 
 @app.route("/search", methods=["POST"])
 def search_food():
