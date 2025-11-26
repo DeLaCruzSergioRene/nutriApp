@@ -7,12 +7,10 @@ import requests
 #  app.config['MYSQL_DB'] = 'prueba'
 # app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
-
 # mysql = MySQL(app)
 
 USDA_API_URL = "https://api.nal.usda.gov/fdc/v1/foods/search"
 USDA_API_KEY = "rfTd35c18oR2TY0uJOMRZpk6kPH9TsHy8Id90E3k" 
-
 
 app = Flask(__name__)
 
