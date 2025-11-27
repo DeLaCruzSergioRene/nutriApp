@@ -145,7 +145,6 @@
                 <div class="row">
                     <div class="col-md-4">
                         <label for="objetivo" class="form-label">Objetivo:</label>
-
                         <select class="form-select" id="objetivo" name="objetivo" value = "{{ request.form.get('objetivo', '')}}" required>
                             <option value="">...</option>
                             <option value="1">Bajar de peso</option>
@@ -154,12 +153,10 @@
                             <option value="4">Subir de peso</option>
                             <option value="5">Obtener dietas saludables</option>
                             <option value="6">Otro...</option> 
-
                         </select>
                     </div>
                     <div class="col-md-4">
                         <label for="dieta" class="form-label">Dieta</label>
-
                         <select class="form-select" id="dieta" name="dieta" value = "{{ request.form.get('dieta', '')}}" required>
                             <option value="">...</option> 
                             <option value="1">Keto</option>
@@ -173,15 +170,12 @@
                             
                         </select>
                     </div>
-                    
                 <div class="col-md-4">
                         <label for="alergias" class="form-label">Alergias</label>
-
                         <input type="text" class="form-control" id="alergias" name="alergias" value = "{{ request.form.get('alergias', '')}}" placeholder="...">
                         </div>
                     </div>
                 </div>
-                    
                     <div class="col-md-4">
                         <select class="form-select" id="actividad" name="actividad" value = "{{ request.form.get('actividad', '')}}" required>
                             <option value="">Actividad física:</option> 
@@ -191,8 +185,6 @@
                             <option value="2025">Extrema</option>
                         </select>
                     </div>
-
-        
                 </div>
             </div>
 
