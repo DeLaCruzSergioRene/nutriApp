@@ -6,11 +6,11 @@
 <form action="{{ url_for('imc_calcular') }}" method="POST">
     <div class="mb-3">
         <label class="form-label">Peso:</label>
-        <input type="number" step="0.1" class="form-control" name="peso" required>
+        <input type="number" step="0.1" class="form-control" name="peso" placeholder="Introduce tu peso en kg" required>
     </div>
     <div class="mb-3">
         <label class="form-label">Estatura:</label>
-        <input type="number" step="0.1" class="form-control" name="estatura" required>
+        <input type="number" step="0.1" class="form-control" name="estatura" placeholder="Introduce tu estatura en cm" required>
     </div>
     <button type="submit" class="btn btn-primary w-100 py-2">Calcular</button>
 </form>
