@@ -194,16 +194,6 @@ def cerrar_sesion():
 def cuenta():
     return render_template("cuentaUsuario.html")
 
-@app.route("/imc_calcular", methods=["POST"])
-def imc_calcular():
-    resultado = None
-    peso = float(request.form["peso"])
-    estatura = float(request.form["estatura"])
-    if request.method == "POST":
-        resultado = peso / estatura
-        resultado = (resultado)
-        return render_template("calculadora_imc.html", resultado=resultado)
-    
 @app.route("/search")
 def search():
     return render_template("buscar.html")
