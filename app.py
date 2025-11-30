@@ -35,6 +35,22 @@ def sesion():
 def informacion():
     return render_template('informacion.html')
 
+@app.route('/masa')
+def calculadora_imc():
+    return render_template('calculadora_imc.html')
+
+@app.route('/masa/calcular', methods=["GET", "POST"])
+def calcular_imc():
+    resultado = None
+    if request.method == "POST":
+        peso = float(request.form["peso"])
+        estatura = float(request.form["estatura"])  # en cm
+        # Pasar a metros
+        estatura_m = estatura / 100
+        # IMC = peso / (estatura_m * estatura_m)
+        resultado = round(peso / (estatura_m * estatura_m), 2)
+    return render_template("calculadora_imc.html", resultado=resultado)
+
 @app.route('/basal')
 def calculadora_basal():
     return render_template('calculadora_basal.html')
@@ -87,10 +103,6 @@ def calculadora_idea():
 @app.route('/macro')
 def calculadora_macro():
     return render_template('calculadora_macro.html')
-
-@app.route('/masa')
-def calculadora_imc():
-    return render_template('calculadora_imc.html')
 
 @app.route('/calcular_macro', methods=["POST"])
 def calcular_macro():
