@@ -17,7 +17,7 @@
 
 -- Volcando estructura de base de datos para Izakaya
 CREATE DATABASE IF NOT EXISTS `izakaya` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
-USE `Izakaya`;
+USE `izakaya`;
 
 -- Volcando estructura para tabla Izakaya.usuario
 CREATE TABLE IF NOT EXISTS `usuario` (

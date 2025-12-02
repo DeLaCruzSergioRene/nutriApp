@@ -18,10 +18,10 @@ mysql = MySQL(app)
 USDA_API_URL = "https://api.nal.usda.gov/fdc/v1/foods/search"
 USDA_API_KEY = "rfTd35c18oR2TY0uJOMRZpk6kPH9TsHy8Id90E3k" 
 
-
 def crear_tabla_users():
     try:
-        cursor = mysql.connection.cursor()
+        conn = mysql.connect()
+        cursor = conn.cursor()
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS usuario (
                 user_ID int(11) NOT NULL AUTO_INCREMENT,
@@ -31,74 +31,86 @@ def crear_tabla_users():
                 mes tinyint(4) NOT NULL,
                 anio int(11) NOT NULL,
                 genero enum('H','M','O','P') NOT NULL,
-                correo varchar(50) NOT NULL,
-                contrasenia varchar(50) NOT NULL,
-                PRIMARY KEY (`user_ID`)
+                correo varchar(50) NOT NULL UNIQUE,
+                contrasena varchar(50) NOT NULL,
+                PRIMARY KEY (user_ID)
             )
         ''')
-        mysql.connection.commit()
+        conn.commit()
+        conn.close()
         print("Tabla 'usuario' creada o ya existe")
     except Exception as e:
         print(f"Error creando tabla: {e}")
 
 def email_existe(correo):
-    cursor = mysql.connection.cursor()
-    cursor.execute("SELECT correo FROM usuarios WHERE correo=%s", (correo,))
-    return cursor.fetchone() is not None
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute("SELECT correo FROM usuario WHERE correo=%s", (correo,))
+    result = cursor.fetchone()
+    conn.close()
+    return result is not None
 
 def obtener_usuario_por_email(correo):
- try:
-    cursor = mysql.connection.cursor()
-    cursor.execute("SELECT * FROM usuarios WHERE correo=%s", (correo,))
-    return cursor.fetchone()  
- except Exception as e:
-    print(f"Error obteniendo usuario: {e}")
-    return None
-
-def registrar_usuario(nombre, genero, actFisica, peso, altura, correo, contrasena):
     try:
-        cursor = mysql.connection.cursor()
-        hashed = generate_password_hash(passw)
-        cursor.execute(
-            '''INSERT INTO usuarios(nombre, genero, actFisica, peso, altura, correo, contrasena)
-               VALUES (%s, %s, %s, %s, %s, %s, %s,)''',
-            (nombre, genero, actFisica, peso, altura, correo, hashed)
-        )
-
-        mysql.connection.commit()
-        return True, f"Registrado con exito: {correo}"
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM usuario WHERE correo=%s", (correo,))
+        user = cursor.fetchone()
+        conn.close()
+        return user
     except Exception as e:
+        print(f"Error obteniendo usuario: {e}")
+        return None
+
+def registrar_usuario(nombre, genero, dia, mes, anio, correo, contrasena):
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        hashed = generate_password_hash(contrasena)
+        cursor.execute('''
+            INSERT INTO usuario (nombre, apellidos, dia, mes, anio, genero, correo, contrasena)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        ''', (nombre, apellidos, dia, mes, anio, genero, correo, hashed))
+        conn.commit()
+        conn.close()
+        return True, f"Registrado con éxito: {correo}"
+    except Exception as e:
+        conn.close()
         if "Duplicate" in str(e):
-            return False, "El correo ingresado ya esta siendo usado por otra cuenta"
+            return False, "El correo ingresado ya está siendo usado por otra cuenta"
         return False, f"Error al registrar usuario: {e}"
 
-def actualizar_usuario_por_correo(correo, nombre, genero, actFisica, peso, altura):
+def actualizar_usuario_por_correo(correo, nombre, genero, dia, mes, anio):
     try:
-        cursor = mysql.connection.cursor()
-        cursor.execute('''UPDATE usuarios
-                          SET nombre=%s, genero=%s, actFisica=%s, peso=%s, altura=%s
-                          WHERE correo=%s''',
-                       (nombre, genero, actFisica, peso, altura, correo))
-        mysql.connection.commit()
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.execute('''
+            UPDATE usuario SET nombre=%s, genero=%s, dia=%s, mes=%s, anio=%s
+            WHERE correo=%s
+        ''', (nombre, genero, dia, mes, anio, correo))
+        conn.commit()
+        conn.close()
         return True, "Cambios guardados exitosamente"
     except Exception as e:
+        conn.close()
         return False, f"Error al actualizar perfil: {e}"
 
 def eliminar_usuario_por_correo(correo):
     try:
-        cursor = mysql.connection.cursor()
-        cursor.execute("DELETE FROM usuarios WHERE correo=%s", (correo,))
-        mysql.connection.commit()
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM usuario WHERE correo=%s", (correo,))
+        conn.commit()
+        conn.close()
         return True, "Tu cuenta ha sido eliminada exitosamente."
     except Exception as e:
+        conn.close()
         return False, f"Error al eliminar cuenta: {e}"
 
 try:
     crear_tabla_users()
 except:
-    print("Advertencia: tabla usuarios no verificada.")
-
-
+    print("Advertencia: tabla 'usuario' no verificada.")
 
 def necesita_sesion():
     return "email" not in session  # True si NO hay sesión
@@ -232,10 +244,14 @@ def registrame():
         flash("La contraseña no coincide")
         return render_template("registro.html")
 
-    cursor = mysql.connect().cursor()
-    cursor.execute("INSERT INTO usuario (nombre, apellidos, dia, mes, anio, genero, correo, contrasena) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
-        (nombre,apellidos,dia,mes,anio,genero,email,contrasena))
-    cursor.connection.commit()
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO usuario (nombre, apellidos, dia, mes, anio, genero, correo, contrasena)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+    ''', (nombre, apellidos, dia, mes, anio, genero, email, contrasena))
+    conn.commit()
+    conn.close()
     flash("Registro exitoso!")
     return redirect(url_for("sesion"))
 
@@ -243,10 +259,11 @@ def registrame():
 def login():
     email = request.form["email"]
     contrasena = request.form["contrasena"]
-
-    cursor = mysql.connect().cursor()
-    cursor.execute("SELECT * FROM usuario WHERE correo=%s AND contrasenaa=%s",(email,contrasena))
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM usuario WHERE correo=%s AND contrasena=%s", (email, contrasena))
     user = cursor.fetchone()
+    conn.close()
     if user:
         session["email"] = email
         flash("Sesión iniciada")
