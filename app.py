@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''
+app.config['MYSQL_PASSWORD'] = '' 
 app.config['MYSQL_DB'] = 'prueba'
 
 app.config["SECRET_KEY"] = "una_clave_secreta_muy_larga_y_dificil_de_adivinar"
@@ -19,7 +19,7 @@ USDA_API_URL = "https://api.nal.usda.gov/fdc/v1/foods/search"
 USDA_API_KEY = "rfTd35c18oR2TY0uJOMRZpk6kPH9TsHy8Id90E3k" 
 
 def necesita_sesion():
-    return "email" not in session  # True si NO hay sesión
+    return "email" not in session 
 
 @app.route('/')
 def index():
@@ -46,7 +46,7 @@ def calcular_imc():
     resultado = None
     if request.method == "POST":
         peso = float(request.form["peso"])
-        estatura = float(request.form["estatura"])  # en cm
+        estatura = float(request.form["estatura"]) 
         # Pasar a metros
         estatura_m = estatura / 100
         # IMC = peso / (estatura_m * estatura_m)
@@ -123,7 +123,6 @@ def calcular_macro():
         "carbohidratos": carbohidratos,
         "calorias_totales": round(calorias_totales, 2)
     }
-    
     return render_template("calculadora_macro.html", resultado=resultado)
 
 @app.route('/abo')
@@ -149,8 +148,9 @@ def registrame():
     if contrasena != confirmar:
         flash("La contraseña no coincide")
         return render_template("registro.html")
-
-    cursor = mysql.connect().cursor()
+    
+    conn = mysql.connect()
+    cursor = conn.cursor()
     cursor.execute("INSERT INTO usuario (nombre, apellidos, dia, mes, anio, genero, correo, contrasenia) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
         (nombre,apellidos,dia,mes,anio,genero,email,contrasena))
     cursor.connection.commit()
@@ -175,28 +175,26 @@ def login():
 
 @app.route("/cerrar_sesion")
 def cerrar_sesion():
-    session.clear()  
+    session.clear() 
     return redirect(url_for("sesion"))
 
 @app.route("/cue", methods=["GET"])
 def cuenta():
     return render_template("cuentaUsuario.html")
 
-@app.route("/search")
-def search():
+@app.route("/search", methods=["GET", "POST"])
+def search_food_route():
     if "email" not in session:
         return redirect(url_for("sesion"))
-    return render_template("buscar.html")
+    
+    if request.method == "GET":
+        return render_template("buscar.html")
 
-@app.route("/search", methods=["POST"])
-def search_food():
-    if "email" not in session:
-        return redirect(url_for("sesion"))
     query = request.form.get("food_name", "").strip()
     
     if not query:
         flash("Por favor ingresa un alimento para buscar.")
-        return redirect(url_for("index"))
+        return render_template("buscar.html")
     
     try:
         params = {
@@ -213,7 +211,7 @@ def search_food():
             
             if not foods:
                 flash(f"No se encontraron resultados para '{query}'.", "error")
-                return redirect(url_for("index"))
+                return render_template("buscar.html")
 
             results = []
             for f in foods:
@@ -231,11 +229,11 @@ def search_food():
             return render_template("buscar_re.html", query=query, foods=results)
         else:
             flash(f"Error en la búsqueda: {response.status_code}", "error")
-            return redirect(url_for("index"))
+            return render_template("buscar.html")
 
     except requests.exceptions.RequestException as e:
         flash(f"Error al conectarse con la API: {e}", "error")
-        return redirect(url_for("index"))
+        return render_template("buscar.html")
 
 if __name__ == '__main__':
     app.run(debug=True)
