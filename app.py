@@ -18,9 +18,6 @@ mysql = MySQL(app)
 USDA_API_URL = "https://api.nal.usda.gov/fdc/v1/foods/search"
 USDA_API_KEY = "rfTd35c18oR2TY0uJOMRZpk6kPH9TsHy8Id90E3k" 
 
-def necesita_sesion():
-    return "email" not in session 
-
 @app.route('/')
 def index():
     return render_template('index.html')
