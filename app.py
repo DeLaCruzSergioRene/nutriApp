@@ -8,8 +8,8 @@ app = Flask(__name__)
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = '' 
-app.config['MYSQL_DB'] = 'prueba'
+app.config['MYSQL_PASSWORD'] = ''
+app.config['MYSQL_DB'] = 'Izakaya'
 
 app.config["SECRET_KEY"] = "una_clave_secreta_muy_larga_y_dificil_de_adivinar"
 
@@ -17,6 +17,91 @@ mysql = MySQL(app)
 
 USDA_API_URL = "https://api.nal.usda.gov/fdc/v1/foods/search"
 USDA_API_KEY = "rfTd35c18oR2TY0uJOMRZpk6kPH9TsHy8Id90E3k" 
+
+
+def crear_tabla_users():
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS usuario (
+                user_ID int(11) NOT NULL AUTO_INCREMENT,
+                nombre varchar(50) NOT NULL,
+                apellidos varchar(50) NOT NULL,
+                dia tinyint(4) NOT NULL,
+                mes tinyint(4) NOT NULL,
+                anio int(11) NOT NULL,
+                genero enum('H','M','O','P') NOT NULL,
+                correo varchar(50) NOT NULL,
+                contrasenia varchar(50) NOT NULL,
+                PRIMARY KEY (`user_ID`)
+            )
+        ''')
+        mysql.connection.commit()
+        print("Tabla 'usuario' creada o ya existe")
+    except Exception as e:
+        print(f"Error creando tabla: {e}")
+
+def email_existe(correo):
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT correo FROM usuarios WHERE correo=%s", (correo,))
+    return cursor.fetchone() is not None
+
+def obtener_usuario_por_email(correo):
+ try:
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM usuarios WHERE correo=%s", (correo,))
+    return cursor.fetchone()  
+ except Exception as e:
+    print(f"Error obteniendo usuario: {e}")
+    return None
+
+def registrar_usuario(nombre, genero, actFisica, peso, altura, correo, contrasena):
+    try:
+        cursor = mysql.connection.cursor()
+        hashed = generate_password_hash(passw)
+        cursor.execute(
+            '''INSERT INTO usuarios(nombre, genero, actFisica, peso, altura, correo, contrasena)
+               VALUES (%s, %s, %s, %s, %s, %s, %s,)''',
+            (nombre, genero, actFisica, peso, altura, correo, hashed)
+        )
+
+        mysql.connection.commit()
+        return True, f"Registrado con exito: {correo}"
+    except Exception as e:
+        if "Duplicate" in str(e):
+            return False, "El correo ingresado ya esta siendo usado por otra cuenta"
+        return False, f"Error al registrar usuario: {e}"
+
+def actualizar_usuario_por_correo(correo, nombre, genero, actFisica, peso, altura):
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute('''UPDATE usuarios
+                          SET nombre=%s, genero=%s, actFisica=%s, peso=%s, altura=%s
+                          WHERE correo=%s''',
+                       (nombre, genero, actFisica, peso, altura, correo))
+        mysql.connection.commit()
+        return True, "Cambios guardados exitosamente"
+    except Exception as e:
+        return False, f"Error al actualizar perfil: {e}"
+
+def eliminar_usuario_por_correo(correo):
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute("DELETE FROM usuarios WHERE correo=%s", (correo,))
+        mysql.connection.commit()
+        return True, "Tu cuenta ha sido eliminada exitosamente."
+    except Exception as e:
+        return False, f"Error al eliminar cuenta: {e}"
+
+try:
+    crear_tabla_users()
+except:
+    print("Advertencia: tabla usuarios no verificada.")
+
+
+
+def necesita_sesion():
+    return "email" not in session  # True si NO hay sesión
 
 @app.route('/')
 def index():
@@ -43,7 +128,7 @@ def calcular_imc():
     resultado = None
     if request.method == "POST":
         peso = float(request.form["peso"])
-        estatura = float(request.form["estatura"]) 
+        estatura = float(request.form["estatura"])  # en cm
         # Pasar a metros
         estatura_m = estatura / 100
         # IMC = peso / (estatura_m * estatura_m)
@@ -120,6 +205,7 @@ def calcular_macro():
         "carbohidratos": carbohidratos,
         "calorias_totales": round(calorias_totales, 2)
     }
+    
     return render_template("calculadora_macro.html", resultado=resultado)
 
 @app.route('/abo')
@@ -145,10 +231,9 @@ def registrame():
     if contrasena != confirmar:
         flash("La contraseña no coincide")
         return render_template("registro.html")
-    
-    conn = mysql.connect()
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO usuario (nombre, apellidos, dia, mes, anio, genero, correo, contrasenia) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+
+    cursor = mysql.connect().cursor()
+    cursor.execute("INSERT INTO usuario (nombre, apellidos, dia, mes, anio, genero, correo, contrasena) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
         (nombre,apellidos,dia,mes,anio,genero,email,contrasena))
     cursor.connection.commit()
     flash("Registro exitoso!")
@@ -160,7 +245,7 @@ def login():
     contrasena = request.form["contrasena"]
 
     cursor = mysql.connect().cursor()
-    cursor.execute("SELECT * FROM usuario WHERE correo=%s AND contrasenia=%s",(email,contrasena))
+    cursor.execute("SELECT * FROM usuario WHERE correo=%s AND contrasenaa=%s",(email,contrasena))
     user = cursor.fetchone()
     if user:
         session["email"] = email
@@ -172,26 +257,28 @@ def login():
 
 @app.route("/cerrar_sesion")
 def cerrar_sesion():
-    session.clear() 
+    session.clear()  
     return redirect(url_for("sesion"))
 
 @app.route("/cue", methods=["GET"])
 def cuenta():
     return render_template("cuentaUsuario.html")
 
-@app.route("/search", methods=["GET", "POST"])
-def search_food_route():
+@app.route("/search")
+def search():
     if "email" not in session:
         return redirect(url_for("sesion"))
-    
-    if request.method == "GET":
-        return render_template("buscar.html")
+    return render_template("buscar.html")
 
+@app.route("/search", methods=["POST"])
+def search_food():
+    if "email" not in session:
+        return redirect(url_for("sesion"))
     query = request.form.get("food_name", "").strip()
     
     if not query:
         flash("Por favor ingresa un alimento para buscar.")
-        return render_template("buscar.html")
+        return redirect(url_for("index"))
     
     try:
         params = {
@@ -208,7 +295,7 @@ def search_food_route():
             
             if not foods:
                 flash(f"No se encontraron resultados para '{query}'.", "error")
-                return render_template("buscar.html")
+                return redirect(url_for("index"))
 
             results = []
             for f in foods:
@@ -226,11 +313,11 @@ def search_food_route():
             return render_template("buscar_re.html", query=query, foods=results)
         else:
             flash(f"Error en la búsqueda: {response.status_code}", "error")
-            return render_template("buscar.html")
+            return redirect(url_for("index"))
 
     except requests.exceptions.RequestException as e:
         flash(f"Error al conectarse con la API: {e}", "error")
-        return render_template("buscar.html")
+        return redirect(url_for("index"))
 
 if __name__ == '__main__':
     app.run(debug=True)
