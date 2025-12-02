@@ -10,7 +10,6 @@ app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
 app.config['MYSQL_DB'] = 'prueba'
-#app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 app.config["SECRET_KEY"] = "una_clave_secreta_muy_larga_y_dificil_de_adivinar"
 
@@ -18,6 +17,9 @@ mysql = MySQL(app)
 
 USDA_API_URL = "https://api.nal.usda.gov/fdc/v1/foods/search"
 USDA_API_KEY = "rfTd35c18oR2TY0uJOMRZpk6kPH9TsHy8Id90E3k" 
+
+def necesita_sesion():
+    return "email" not in session  # True si NO hay sesión
 
 @app.route('/')
 def index():
@@ -102,6 +104,8 @@ def calculadora_idea():
 
 @app.route('/macro')
 def calculadora_macro():
+    if "email" not in session:
+        return redirect(url_for("sesion"))
     return render_template('calculadora_macro.html')
 
 @app.route('/calcular_macro', methods=["POST"])
@@ -130,65 +134,49 @@ def nosotros():
 def datos():
     return render_template('usoDatos.html')
 
-@app.route("/registrame", methods=["GET", "POST"])
+@app.route("/registrame", methods=["POST"])
 def registrame():
-    error = None
-    if request.method == "POST":
-        nombre = request.form["nombre"]
-        apellidos = request.form["apellidos"]
-        dia = request.form["dia"]
-        mes = request.form["mes"]
-        anio = request.form["anio"]
-        objetivo = request.form["objetivo"]
-        dieta = request.form["dieta"]
-        alergias = request.form["alergias"]
-        actividad = request.form["actividad"]
-        genero = request.form["genero"]
-        email = request.form["email"]
-        contrasena = request.form["contrasena"]
-        confirmar_contrasena = request.form["confirmar_contrasena"]
-        
-        if len(nombre) < 3:
-            flash("El nombre debe tener al menos 3 caracteres.")
-            return render_template("registro.html", nombre=nombre)
-        
-        if len(apellidos) < 3:
-            flash("No puede haber menos de 3 caracteres en los apellidos.")
-            return render_template("registro.html", apellidos=apellidos) 
-        
-        if contrasena != confirmar_contrasena:
-            error = "La contraseña no coincide."
-            
-        if error != None:
-            flash(error)
-            return render_template("registro.html")
-        else:
-            flash(f"¡Registro exitoso para el usuario: ¡{nombre}!")
-            return render_template("index.html")
+    nombre = request.form["nombre"]
+    apellidos = request.form["apellidos"]
+    dia = int(request.form["dia"])
+    mes = int(request.form["mes"])
+    anio = int(request.form["anio"])
+    genero = request.form["genero"]
+    email = request.form["email"]
+    contrasena = request.form["contrasena"]
+    confirmar = request.form["confirmar_contrasena"]
 
-@app.route("/login", methods=["GET", "POST"])
+    if contrasena != confirmar:
+        flash("La contraseña no coincide")
+        return render_template("registro.html")
+
+    cursor = mysql.connect().cursor()
+    cursor.execute("INSERT INTO usuario (nombre, apellidos, dia, mes, anio, genero, correo, contrasenia) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+        (nombre,apellidos,dia,mes,anio,genero,email,contrasena))
+    cursor.connection.commit()
+    flash("Registro exitoso!")
+    return redirect(url_for("sesion"))
+
+@app.route("/login", methods=["POST"])
 def login():
-    error = None
-    if request.method == "POST":
-        email = request.form["email"]
-        contrasena = request.form["contrasena"]
-        confirmar_contrasena = request.form["confirmar_contrasena"]
-        if contrasena != confirmar_contrasena:
-            error = "La contraseña no coincide."
-            
-        if error != None:
-            flash(error)
-            return render_template("sesion.html")
-        else:
-            session["email"] = email
-            flash(f"¡Registro exitoso para el usuario: ¡{email}!")
-            return redirect(url_for("index"))
-    return render_template("sesion.html")
+    email = request.form["email"]
+    contrasena = request.form["contrasena"]
+
+    cursor = mysql.connect().cursor()
+    cursor.execute("SELECT * FROM usuario WHERE correo=%s AND contrasenia=%s",(email,contrasena))
+    user = cursor.fetchone()
+    if user:
+        session["email"] = email
+        flash("Sesión iniciada")
+        return redirect(url_for("index"))
+    else:
+        flash("Usuario o contraseña incorrecta")
+        return render_template("sesion.html")
 
 @app.route("/cerrar_sesion")
 def cerrar_sesion():
     session.clear()  
-    return redirect(url_for("login"))
+    return redirect(url_for("sesion"))
 
 @app.route("/cue", methods=["GET"])
 def cuenta():
@@ -196,10 +184,14 @@ def cuenta():
 
 @app.route("/search")
 def search():
+    if "email" not in session:
+        return redirect(url_for("sesion"))
     return render_template("buscar.html")
 
 @app.route("/search", methods=["POST"])
 def search_food():
+    if "email" not in session:
+        return redirect(url_for("sesion"))
     query = request.form.get("food_name", "").strip()
     
     if not query:
