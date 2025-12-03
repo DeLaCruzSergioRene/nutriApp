@@ -1,12 +1,82 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% block title %}Mi Información - Solo Lectura{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <h1 class="text-center mb-5 text-dark fw-bold">
+            Tu Perfil Nutricional (Vista Estricta)
+        </h1>
+        <div class="card shadow-lg mb-4 border-primary">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Datos Personales y Contacto</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p class="mb-0 text-muted">Nombre Completo:</p>
+                        <p class="fs-5 fw-bold">{{ user.nombre }} {{ user.apellidos }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-0 text-muted">Correo Electrónico:</p>
+                        <p class="fs-5 fw-bold">{{ user.correo }}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-0 text-muted">Fecha de Nacimiento:</p>
+                        <p class="fs-5 fw-bold">{{ user.dia }}/{{ user.mes }}/{{ user.anio }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-0 text-muted">Actividad Física:</p>
+                        <p class="fs-5 fw-bold">
+                            {% if user.actFisica == 'Y' %}Sí{% else %}No{% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-
-{% block contenido %}
-
-<div class="Container">
-
-<p>Nada</p>
-
-
-{% endblock %}
+        <!-- CARD 2: Perfil Nutricional -->
+        <div class="card shadow-lg mb-4 border-success">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Perfil y Metas Nutricionales</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <p class="mb-0 text-muted">Objetivo Principal:</p>
+                        <p class="fs-5">{{ user.objetivo | default('No especificado') }}</p>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p class="mb-0 text-muted">Tipo de Dieta:</p>
+                        <p class="fs-5">{{ user.dieta | default('General') }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-0 text-muted">Género:</p>
+                        <!-- Muestra el texto completo basado en el ENUM (H/M/O/P) -->
+                        <p class="fs-5">
+                            {% if user.genero == 'H' %}Hombre
+                            {% elif user.genero == 'M' %}Mujer
+                            {% elif user.genero == 'O' %}Otro
+                            {% else %}Prefiero no decir
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <p class="mb-0 text-muted">Alergias / Restricciones:</p>
+                        <p class="fs-5">{{ user.alergias | default('Ninguna') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="alert alert-info text-center mt-4" role="alert">
+            Esta es una vista de solo lectura y no contiene elementos interactivos o enlaces.
+        </div>
     </div>
+</div>
+{% endblock %}

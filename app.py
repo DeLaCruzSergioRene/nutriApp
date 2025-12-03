@@ -14,6 +14,8 @@ DB_CONFIG = {
 
 app.config["SECRET_KEY"] = "una_clave_secreta_muy_larga_y_dificil_de_adivinar"
 
+# --- FUNCIONES DE BASE DE DATOS ---
+
 def get_db_connection():
     """Establece una conexión con la base de datos MySQL."""
     try:
@@ -24,7 +26,7 @@ def get_db_connection():
         return None
 
 def crear_tabla_users():
-    """Asegura que la tabla 'usuario' exista."""
+    """Asegura que la tabla 'usuario' exista, incluyendo todos los campos nutricionales."""
     conn = get_db_connection()
     if conn is None: return
         
@@ -43,6 +45,12 @@ def crear_tabla_users():
                 actFisica ENUM('Y','N') NOT NULL, 
                 correo VARCHAR(50) NOT NULL UNIQUE,
                 contrasena VARCHAR(255) NOT NULL, 
+                
+                -- CAMPOS DE NUTRICIÓN REQUERIDOS EN EL REGISTRO
+                objetivo VARCHAR(100) NULL,
+                dieta VARCHAR(100) NULL,
+                alergias TEXT NULL,
+                
                 PRIMARY KEY (user_ID)
             )
         ''')
@@ -61,7 +69,7 @@ except Exception:
     pass
 
 def obtener_usuario_por_email(correo):
-    """Obtiene los datos del usuario por correo electrónico."""
+    """Obtiene los datos completos del usuario por correo electrónico, incluyendo los campos nutricionales."""
     conn = get_db_connection()
     if conn is None: return None
         
@@ -69,7 +77,14 @@ def obtener_usuario_por_email(correo):
     cursor = None
     try:
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT user_ID, nombre, apellidos, dia, mes, anio, genero, actFisica, correo, contrasena FROM usuario WHERE correo=%s", (correo,))
+        # Se seleccionan todos los campos
+        query = """
+        SELECT user_ID, nombre, apellidos, dia, mes, anio, genero, actFisica, correo, contrasena, 
+               objetivo, dieta, alergias 
+        FROM usuario 
+        WHERE correo=%s
+        """
+        cursor.execute(query, (correo,))
         user_data = cursor.fetchone()
         
         if user_data:
@@ -81,6 +96,8 @@ def obtener_usuario_por_email(correo):
             if cursor: cursor.close()
             conn.close()
         return user_dict
+
+# --- RUTAS PRINCIPALES DE VISTA (GET) ---
 
 @app.route('/')
 def index():
@@ -106,6 +123,8 @@ def nosotros():
 def datos():
     return render_template('usoDatos.html')
 
+# --- RUTAS DE CALCULADORAS ---
+
 @app.route('/masa')
 def calculadora_imc():
     return render_template('calculadora_imc.html')
@@ -119,7 +138,6 @@ def calcular_imc():
             imc = peso / ((estatura / 100) ** 2)
             resultado = round(imc, 2)
         except ValueError:
-            # Mensaje flash 
             flash("Oye, asegúrate de poner solo números válidos para tu peso y estatura.", 'error')
     return render_template("calculadora_imc.html", resultado=resultado)
 
@@ -139,7 +157,6 @@ def calcular_tmb():
                 resultado = 10 * peso + 6.25 * altura - 5 * edad - 161
             resultado = round(resultado, 2)
         except ValueError:
-            # Mensaje flash
             flash("Necesitas ingresar valores numéricos válidos en todos los campos.", 'error')
     return render_template("calculadora_basal.html", resultado=resultado)
 
@@ -155,7 +172,6 @@ def calculadora_gct():
             tmb, factor = float(request.form["tmb"]), float(request.form["factor"])
             resultado = round(tmb * factor, 2)
         except ValueError:
-            # Mensaje flash 
             flash("Por favor, revisa que tus datos sean números válidos.", 'error')
     return render_template("calculadora_gasto.html", resultado=resultado)
 
@@ -175,7 +191,6 @@ def calculadora_idea():
                 resultado = 45.5 + 0.91 * (altura - 152)
             resultado = round(resultado, 2)
         except ValueError:
-            # Mensaje flash 
             flash("Recuerda usar solo números para la altura.", 'error')
     return render_template("calculadora_ideal.html", resultado=resultado)
 
@@ -194,21 +209,18 @@ def calcular_macro():
         calorias_totales = (grasas * 9) + (proteinas * 4) + (carbohidratos * 4)
         resultado = {"alimento": alimento, "grasas": grasas, "proteinas": proteinas, "carbohidratos": carbohidratos, "calorias_totales": round(calorias_totales, 2)}
     except ValueError:
-        # Mensaje flash 
         flash("Asegúrate de que los valores de macronutrientes sean números.", 'error')
     return render_template("calculadora_macro.html", resultado=resultado)
 
 @app.route("/search", methods=["GET", "POST"])
 def search_food():
     if "email" not in session and request.method == "POST": 
-        # Mensaje flash 
         flash("Para buscar alimentos, primero debes iniciar sesión.", 'warning')
         return redirect(url_for("sesion"))
 
     if request.method == "POST":
         query = request.form.get("food_name", "").strip()
         if not query:
-            # Mensaje flash 
             flash("¡Ups! Olvidaste escribir el nombre del alimento.", "warning")
             return redirect(url_for("search_food"))
         try:
@@ -218,7 +230,6 @@ def search_food():
             if response.status_code == 200:
                 foods = response.json().get("foods", [])
                 if not foods:
-                    # Mensaje flash 
                     flash(f"No encontramos resultados para '{query}'. Intenta con otro nombre.", "info")
                     return render_template("buscar.html")
                 results = []
@@ -234,15 +245,15 @@ def search_food():
                     })
                 return render_template("buscar_re.html", query=query, foods=results)
             else:
-                # Mensaje flash 
                 flash(f"Ocurrió un error al intentar buscar la información (Código: {response.status_code}).", "error")
                 return render_template("buscar.html")
         except requests.exceptions.RequestException as e:
-            # Mensaje flash 
             flash(f"Error de conexión con la base de datos de alimentos: {e}", "error")
             return render_template("buscar.html")
     
     return render_template("buscar.html")
+
+# --- RUTAS DE AUTENTICACIÓN Y CUENTA ---
 
 @app.route("/registrame", methods=["POST"])
 def registrame():
@@ -253,10 +264,16 @@ def registrame():
 
     cursor = None
     try:
+        # Campos de usuario básicos
         nombre, apellidos = request.form["nombre"], request.form["apellidos"]
         dia, mes, anio = int(request.form["dia"]), int(request.form["mes"]), int(request.form["anio"])
         genero, actFisica = request.form["genero"], request.form["actFisica"] 
         email, contrasena, confirmar = request.form["email"], request.form["contrasena"], request.form["confirmar_contrasena"]
+        
+        # Campos nutricionales (se toman del formulario, con default a vacío si no se envían)
+        objetivo = request.form.get("objetivo", "")
+        dieta = request.form.get("dieta", "")
+        alergias = request.form.get("alergias", "")
 
         if contrasena != confirmar:
             flash("¡Ojo! Las contraseñas que escribiste no coinciden.", 'warning')
@@ -269,13 +286,16 @@ def registrame():
         hashed_password = generate_password_hash(contrasena)
         
         cursor = conn.cursor()
-        cursor.execute('''
-            INSERT INTO usuario (nombre, apellidos, dia, mes, anio, genero, actFisica, correo, contrasena)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
-        ''', (nombre, apellidos, dia, mes, anio, genero, actFisica, email, hashed_password))
+        query = '''
+            INSERT INTO usuario (nombre, apellidos, dia, mes, anio, genero, actFisica, correo, contrasena, objetivo, dieta, alergias)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        '''
+        values = (nombre, apellidos, dia, mes, anio, genero, actFisica, email, hashed_password, objetivo, dieta, alergias)
+        
+        cursor.execute(query, values)
         
         conn.commit()
-        # Mensaje flash 
+        
         flash("¡Registro completado! Ya puedes entrar a tu cuenta.", 'success')
         return redirect(url_for("sesion"))
 
@@ -294,6 +314,7 @@ def login():
     
     if user and check_password_hash(user['contrasena'], contrasena_plana):
         session["email"], session["nombre"] = user['correo'], user['nombre']
+        session["user_ID"] = user['user_ID'] 
         flash(f"¡Bienvenido, {user['nombre']}!", 'success')
         return redirect(url_for("index"))
     else:
@@ -308,59 +329,69 @@ def cerrar_sesion():
 
 @app.route("/cue", methods=["GET"])
 def cuenta():
+    """Muestra la página de la cuenta del usuario logueado. Usa /cue y cuenta()."""
     if "email" not in session: return redirect(url_for("sesion"))
     user = obtener_usuario_por_email(session['email'])
     
     if user:
         return render_template("cuentaUsuario.html", user=user) 
     
-    # Mensaje flash 
     flash("No pudimos cargar la información de tu cuenta.", 'error')
     return redirect(url_for("index"))
     
 @app.route("/cuenta/actualizar", methods=["POST"])
 def actualizar_usuario():
+    """Procesa el formulario de actualización de datos del usuario."""
     if "email" not in session:
         return redirect(url_for("sesion"))
     conn = get_db_connection()
     if conn is None:
-        # Mensaje flash 
         flash("Error fatal: No se puede conectar a la base de datos para actualizar tus datos.", 'error')
         return redirect(url_for("cuenta"))
 
     cursor = None
     try:
+        # Campos de usuario básicos
         nombre, apellidos = request.form["nombre"], request.form["apellidos"]
         dia, mes, anio = int(request.form["dia"]), int(request.form["mes"]), int(request.form["anio"])
         genero, actFisica = request.form["genero"], request.form["actFisica"] 
         contrasena_nueva = request.form.get("contrasena_nueva", "").strip()
+        
+        # Campos nutricionales
+        objetivo = request.form.get("objetivo", "")
+        dieta = request.form.get("dieta", "")
+        alergias = request.form.get("alergias", "")
+
         cursor = conn.cursor()
         
+        # SQL para actualizar datos básicos y nutricionales
         sql = """
             UPDATE usuario SET 
-                nombre=%s, apellidos=%s, dia=%s, mes=%s, anio=%s, genero=%s, actFisica=%s
+                nombre=%s, apellidos=%s, dia=%s, mes=%s, anio=%s, genero=%s, actFisica=%s, 
+                objetivo=%s, dieta=%s, alergias=%s
             WHERE correo=%s
         """
-        params = (nombre, apellidos, dia, mes, anio, genero, actFisica, session['email'])
+        params = [nombre, apellidos, dia, mes, anio, genero, actFisica, objetivo, dieta, alergias, session['email']]
         
         if contrasena_nueva:
+            # Si hay contraseña nueva, la agregamos a la consulta
             hashed_password = generate_password_hash(contrasena_nueva)
             sql = """
                 UPDATE usuario SET 
-                    nombre=%s, apellidos=%s, dia=%s, mes=%s, anio=%s, genero=%s, actFisica=%s, contrasena=%s
+                    nombre=%s, apellidos=%s, dia=%s, mes=%s, anio=%s, genero=%s, actFisica=%s, 
+                    objetivo=%s, dieta=%s, alergias=%s, contrasena=%s
                 WHERE correo=%s
             """
-            params = (nombre, apellidos, dia, mes, anio, genero, actFisica, hashed_password, session['email'])
+            params.insert(10, hashed_password) # insertamos el hash antes del email
+            
         cursor.execute(sql, params)
         conn.commit()
         
-        # Mensaje flash 
         flash("¡Perfecto! Tus datos han sido actualizados.", 'success')
-        return redirect(url_for("cuenta"))
+        return redirect(url_for("cuenta")) # Redirección consistente a /cue
     except Exception as e:
-        # Mensaje flash 
         flash(f"No pudimos actualizar tu información. Revisa tus datos. Error: {e}", 'error')
-        return redirect(url_for("cuenta"))
+        return redirect(url_for("cuenta")) # Redirección consistente a /cue
     finally:
         if conn and conn.is_connected():
             if cursor: cursor.close()
