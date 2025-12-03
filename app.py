@@ -9,8 +9,8 @@ app = Flask(__name__)
 # Configuración de la base de datos
 DB_CONFIG = {
     'host': 'localhost',
-    'user': 'izakaya',         
-    'password': 'izakaya', 
+    'user': 'root',         
+    'password': '', 
     'database': 'izakaya',
 }
 
