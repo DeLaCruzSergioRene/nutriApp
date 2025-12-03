@@ -3,8 +3,10 @@ import requests
 import mysql.connector
 from werkzeug.security import generate_password_hash, check_password_hash 
 
+# Inicialización de la aplicación Flask
 app = Flask(__name__)
 
+# Configuración de la base de datos
 DB_CONFIG = {
     'host': 'localhost',
     'user': 'izakaya',         
@@ -12,6 +14,7 @@ DB_CONFIG = {
     'database': 'izakaya',
 }
 
+# Clave secreta OBLIGATORIA para el manejo de sesiones de Flask
 app.config["SECRET_KEY"] = "una_clave_secreta_muy_larga_y_dificil_de_adivinar"
 
 # --- FUNCIONES DE BASE DE DATOS ---
@@ -69,7 +72,7 @@ except Exception:
     pass
 
 def obtener_usuario_por_email(correo):
-    """Obtiene los datos completos del usuario por correo electrónico, incluyendo los campos nutricionales."""
+    """Obtiene los datos completos del usuario por correo electrónico."""
     conn = get_db_connection()
     if conn is None: return None
         
@@ -80,7 +83,7 @@ def obtener_usuario_por_email(correo):
         # Se seleccionan todos los campos
         query = """
         SELECT user_ID, nombre, apellidos, dia, mes, anio, genero, actFisica, correo, contrasena, 
-               objetivo, dieta, alergias 
+                objetivo, dieta, alergias 
         FROM usuario 
         WHERE correo=%s
         """
@@ -276,7 +279,7 @@ def registrame():
         alergias = request.form.get("alergias", "")
 
         if contrasena != confirmar:
-            flash("¡Ojo! Las contraseñas que escribiste no coinciden.", 'warning')
+            flash("¡Ojo! Las contraseñas que escribiste noL2 coinciden.", 'warning')
             return render_template("registro.html")
 
         if obtener_usuario_por_email(email):
@@ -313,8 +316,11 @@ def login():
     user = obtener_usuario_por_email(email)
     
     if user and check_password_hash(user['contrasena'], contrasena_plana):
-        session["email"], session["nombre"] = user['correo'], user['nombre']
+        # 🟢 CORRECCIÓN APLICADA: Aseguramos que la clave user_ID se establece de forma independiente
+        session["email"] = user['correo']
+        session["nombre"] = user['nombre']
         session["user_ID"] = user['user_ID'] 
+        
         flash(f"¡Bienvenido, {user['nombre']}!", 'success')
         return redirect(url_for("index"))
     else:
@@ -323,7 +329,7 @@ def login():
 
 @app.route("/cerrar_sesion")
 def cerrar_sesion():
-    session.clear()  
+    session.clear() 
     flash("Tu sesión ha sido cerrada. ¡Vuelve pronto!", 'info')
     return redirect(url_for("sesion"))
 
