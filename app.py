@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 import requests
-import mysql.connector 
+import mysql.connector
 from werkzeug.security import generate_password_hash, check_password_hash 
 
 app = Flask(__name__)
@@ -15,20 +15,20 @@ DB_CONFIG = {
 app.config["SECRET_KEY"] = "una_clave_secreta_muy_larga_y_dificil_de_adivinar"
 
 def get_db_connection():
+    """Establece una conexión con la base de datos MySQL."""
     try:
-        # Usa el conector nativo de MySQL
         return mysql.connector.connect(**DB_CONFIG)
     except mysql.connector.Error as err:
-        # Si falla, imprime el error EXACTO para el usuario 
-        print(f"ERROR DE CONEXIÓN CRÍTICO: {err}")
+        # Mensaje de error 
+        print(f"ERROR CRÍTICO DE CONEXIÓN A LA BD: {err}")
         return None
 
 def crear_tabla_users():
+    """Asegura que la tabla 'usuario' exista."""
     conn = get_db_connection()
-    if conn is None:
-        print("Fallo al conectar para crear la tabla.")
-        return
+    if conn is None: return
         
+    cursor = None
     try:
         cursor = conn.cursor()
         cursor.execute('''
@@ -48,40 +48,39 @@ def crear_tabla_users():
         ''')
         conn.commit()
     except Exception as e:
-        print(f"Error al verificar o crear la tabla: {e}")
+        # Mensaje de error 
+        print(f"Error al verificar o crear la tabla 'usuario': {e}")
     finally:
         if conn and conn.is_connected():
-            cursor.close()
+            if cursor: cursor.close()
             conn.close()
-        
+
 try:
     crear_tabla_users()
 except Exception:
     pass
 
-# Función de utilidad para obtener datos del usuario
 def obtener_usuario_por_email(correo):
+    """Obtiene los datos del usuario por correo electrónico."""
     conn = get_db_connection()
-    if conn is None:
-        return None
+    if conn is None: return None
         
     user_dict = None
+    cursor = None
     try:
-        cursor = conn.cursor(dictionary=True) # Usamos dictionary=True para obtener resultados como dict
+        cursor = conn.cursor(dictionary=True)
         cursor.execute("SELECT user_ID, nombre, apellidos, dia, mes, anio, genero, actFisica, correo, contrasena FROM usuario WHERE correo=%s", (correo,))
         user_data = cursor.fetchone()
         
         if user_data:
             user_dict = user_data
     except Exception as e:
-        print(f"Error al obtener usuario: {e}")
+        print(f"Error al buscar el usuario: {e}")
     finally:
         if conn and conn.is_connected():
-            cursor.close()
+            if cursor: cursor.close()
             conn.close()
         return user_dict
-
-# --- Rutas de Navegación y Vistas ---
 
 @app.route('/')
 def index():
@@ -107,8 +106,6 @@ def nosotros():
 def datos():
     return render_template('usoDatos.html')
 
-# --- Rutas de Calculadoras ---
-
 @app.route('/masa')
 def calculadora_imc():
     return render_template('calculadora_imc.html')
@@ -122,7 +119,8 @@ def calcular_imc():
             imc = peso / ((estatura / 100) ** 2)
             resultado = round(imc, 2)
         except ValueError:
-            flash("Por favor, introduce números válidos para peso y estatura.", 'error')
+            # Mensaje flash 
+            flash("Oye, asegúrate de poner solo números válidos para tu peso y estatura.", 'error')
     return render_template("calculadora_imc.html", resultado=resultado)
 
 @app.route('/basal')
@@ -141,7 +139,8 @@ def calcular_tmb():
                 resultado = 10 * peso + 6.25 * altura - 5 * edad - 161
             resultado = round(resultado, 2)
         except ValueError:
-            flash("Por favor, introduce números válidos.", 'error')
+            # Mensaje flash
+            flash("Necesitas ingresar valores numéricos válidos en todos los campos.", 'error')
     return render_template("calculadora_basal.html", resultado=resultado)
 
 @app.route('/gasto')
@@ -156,7 +155,8 @@ def calculadora_gct():
             tmb, factor = float(request.form["tmb"]), float(request.form["factor"])
             resultado = round(tmb * factor, 2)
         except ValueError:
-            flash("Por favor, introduce números válidos.", 'error')
+            # Mensaje flash 
+            flash("Por favor, revisa que tus datos sean números válidos.", 'error')
     return render_template("calculadora_gasto.html", resultado=resultado)
 
 @app.route('/ideal')
@@ -175,7 +175,8 @@ def calculadora_idea():
                 resultado = 45.5 + 0.91 * (altura - 152)
             resultado = round(resultado, 2)
         except ValueError:
-            flash("Por favor, introduce números válidos.", 'error')
+            # Mensaje flash 
+            flash("Recuerda usar solo números para la altura.", 'error')
     return render_template("calculadora_ideal.html", resultado=resultado)
 
 @app.route('/macro')
@@ -193,19 +194,22 @@ def calcular_macro():
         calorias_totales = (grasas * 9) + (proteinas * 4) + (carbohidratos * 4)
         resultado = {"alimento": alimento, "grasas": grasas, "proteinas": proteinas, "carbohidratos": carbohidratos, "calorias_totales": round(calorias_totales, 2)}
     except ValueError:
-        flash("Por favor, introduce números válidos para los macronutrientes.", 'error')
+        # Mensaje flash 
+        flash("Asegúrate de que los valores de macronutrientes sean números.", 'error')
     return render_template("calculadora_macro.html", resultado=resultado)
 
 @app.route("/search", methods=["GET", "POST"])
 def search_food():
     if "email" not in session and request.method == "POST": 
-        flash("Debes iniciar sesión para realizar búsquedas.", 'warning')
+        # Mensaje flash 
+        flash("Para buscar alimentos, primero debes iniciar sesión.", 'warning')
         return redirect(url_for("sesion"))
 
     if request.method == "POST":
         query = request.form.get("food_name", "").strip()
         if not query:
-            flash("Por favor ingresa un alimento para buscar.", "warning")
+            # Mensaje flash 
+            flash("¡Ups! Olvidaste escribir el nombre del alimento.", "warning")
             return redirect(url_for("search_food"))
         try:
             params = {"api_key": "rfTd35c18oR2TY0uJOMRZpk6kPH9TsHy8Id90E3k", "query": query, "pageSize": 3}
@@ -214,7 +218,8 @@ def search_food():
             if response.status_code == 200:
                 foods = response.json().get("foods", [])
                 if not foods:
-                    flash(f"No se encontraron resultados para '{query}'.", "info")
+                    # Mensaje flash 
+                    flash(f"No encontramos resultados para '{query}'. Intenta con otro nombre.", "info")
                     return render_template("buscar.html")
                 results = []
                 for f in foods:
@@ -229,23 +234,24 @@ def search_food():
                     })
                 return render_template("buscar_re.html", query=query, foods=results)
             else:
-                flash(f"Error en la búsqueda (Código: {response.status_code}).", "error")
+                # Mensaje flash 
+                flash(f"Ocurrió un error al intentar buscar la información (Código: {response.status_code}).", "error")
                 return render_template("buscar.html")
         except requests.exceptions.RequestException as e:
-            flash(f"Error al conectarse con la API de alimentos: {e}", "error")
+            # Mensaje flash 
+            flash(f"Error de conexión con la base de datos de alimentos: {e}", "error")
             return render_template("buscar.html")
     
     return render_template("buscar.html")
-
-# --- Rutas de Autenticación y Cuenta ---
 
 @app.route("/registrame", methods=["POST"])
 def registrame():
     conn = get_db_connection()
     if conn is None:
-        flash("Error fatal de conexión a la base de datos.", 'error')
+        flash("No se pudo conectar a la base de datos para el registro. Intenta más tarde.", 'error')
         return render_template("registro.html")
 
+    cursor = None
     try:
         nombre, apellidos = request.form["nombre"], request.form["apellidos"]
         dia, mes, anio = int(request.form["dia"]), int(request.form["mes"]), int(request.form["anio"])
@@ -253,11 +259,11 @@ def registrame():
         email, contrasena, confirmar = request.form["email"], request.form["contrasena"], request.form["confirmar_contrasena"]
 
         if contrasena != confirmar:
-            flash("La contraseña no coincide", 'warning')
+            flash("¡Ojo! Las contraseñas que escribiste no coinciden.", 'warning')
             return render_template("registro.html")
 
         if obtener_usuario_por_email(email):
-            flash("El correo ya está registrado.", 'warning')
+            flash("Parece que ese correo ya está registrado. ¿Quieres iniciar sesión?", 'warning')
             return render_template("registro.html")
 
         hashed_password = generate_password_hash(contrasena)
@@ -269,15 +275,16 @@ def registrame():
         ''', (nombre, apellidos, dia, mes, anio, genero, actFisica, email, hashed_password))
         
         conn.commit()
-        flash("Registro exitoso! Ya puedes iniciar sesión.", 'success')
+        # Mensaje flash 
+        flash("¡Registro completado! Ya puedes entrar a tu cuenta.", 'success')
         return redirect(url_for("sesion"))
 
     except Exception as e:
-        flash(f"Error al registrar usuario: {e}", 'error')
+        flash(f"Hubo un problema al intentar registrarte. Error: {e}", 'error')
         return render_template("registro.html")
     finally:
         if conn and conn.is_connected():
-            cursor.close()
+            if cursor: cursor.close()
             conn.close()
 
 @app.route("/login", methods=["POST"])
@@ -287,16 +294,16 @@ def login():
     
     if user and check_password_hash(user['contrasena'], contrasena_plana):
         session["email"], session["nombre"] = user['correo'], user['nombre']
-        flash("Sesión iniciada", 'success')
+        flash(f"¡Bienvenido, {user['nombre']}!", 'success')
         return redirect(url_for("index"))
     else:
-        flash("Usuario o contraseña incorrecta.", 'error')
+        flash("El correo o la contraseña no son correctos.", 'error')
         return render_template("sesion.html")
 
 @app.route("/cerrar_sesion")
 def cerrar_sesion():
     session.clear()  
-    flash("Sesión cerrada.", 'info')
+    flash("Tu sesión ha sido cerrada. ¡Vuelve pronto!", 'info')
     return redirect(url_for("sesion"))
 
 @app.route("/cue", methods=["GET"])
@@ -307,25 +314,26 @@ def cuenta():
     if user:
         return render_template("cuentaUsuario.html", user=user) 
     
-    flash("Error al cargar la información del usuario.", 'error')
+    # Mensaje flash 
+    flash("No pudimos cargar la información de tu cuenta.", 'error')
     return redirect(url_for("index"))
     
 @app.route("/cuenta/actualizar", methods=["POST"])
 def actualizar_usuario():
     if "email" not in session:
         return redirect(url_for("sesion"))
-
     conn = get_db_connection()
     if conn is None:
-        flash("Error fatal de conexión a la base de datos.", 'error')
+        # Mensaje flash 
+        flash("Error fatal: No se puede conectar a la base de datos para actualizar tus datos.", 'error')
         return redirect(url_for("cuenta"))
 
+    cursor = None
     try:
         nombre, apellidos = request.form["nombre"], request.form["apellidos"]
         dia, mes, anio = int(request.form["dia"]), int(request.form["mes"]), int(request.form["anio"])
         genero, actFisica = request.form["genero"], request.form["actFisica"] 
         contrasena_nueva = request.form.get("contrasena_nueva", "").strip()
-
         cursor = conn.cursor()
         
         sql = """
@@ -343,19 +351,19 @@ def actualizar_usuario():
                 WHERE correo=%s
             """
             params = (nombre, apellidos, dia, mes, anio, genero, actFisica, hashed_password, session['email'])
-
         cursor.execute(sql, params)
         conn.commit()
         
-        flash("Tus datos han sido actualizados exitosamente.", 'success')
+        # Mensaje flash 
+        flash("¡Perfecto! Tus datos han sido actualizados.", 'success')
         return redirect(url_for("cuenta"))
-
     except Exception as e:
-        flash(f"Error al actualizar la información: {e}", 'error')
+        # Mensaje flash 
+        flash(f"No pudimos actualizar tu información. Revisa tus datos. Error: {e}", 'error')
         return redirect(url_for("cuenta"))
     finally:
         if conn and conn.is_connected():
-            cursor.close()
+            if cursor: cursor.close()
             conn.close()
 
 if __name__ == '__main__':
