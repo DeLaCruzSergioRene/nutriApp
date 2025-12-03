@@ -6,9 +6,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 
 app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'         
-app.config['MYSQL_PASSWORD'] = '12345'         
-app.config['MYSQL_DB'] = 'izakaya' 
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = '' 
+app.config['MYSQL_DB'] = 'prueba'
 
 app.config["SECRET_KEY"] = "una_clave_secreta_muy_larga_y_dificil_de_adivinar"
 
@@ -16,57 +16,6 @@ mysql = MySQL(app)
 
 USDA_API_URL = "https://api.nal.usda.gov/fdc/v1/foods/search"
 USDA_API_KEY = "rfTd35c18oR2TY0uJOMRZpk6kPH9TsHy8Id90E3k" 
-
-def crear_tabla_users():
-    """Crea la tabla 'usuario' con el esquema completo y seguro (contraseña 255)."""
-    try:
-        conn = mysql.connect()
-        cursor = conn.cursor()
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS usuario (
-                user_ID INT(11) NOT NULL AUTO_INCREMENT,
-                nombre VARCHAR(50) NOT NULL,
-                apellidos VARCHAR(50) NOT NULL,
-                dia TINYINT(4) NOT NULL,
-                mes TINYINT(4) NOT NULL,
-                anio INT(11) NOT NULL,
-                genero ENUM('H','M','O','P') NOT NULL,
-                actFisica ENUM('Y','N') NOT NULL, 
-                correo VARCHAR(50) NOT NULL UNIQUE,
-                contrasena VARCHAR(255) NOT NULL, 
-                PRIMARY KEY (user_ID)
-            )
-        ''')
-        conn.commit()
-        conn.close()
-    except Exception as e:
-        print(f"Error al verificar la tabla: {e}")
-        
-try:
-    crear_tabla_users()
-except Exception:
-    pass
-
-def obtener_usuario_por_email(correo):
-    """Obtiene todos los datos de un usuario por su correo. Función auxiliar necesaria para login y perfil."""
-    try:
-        conn = mysql.connect()
-        cursor = conn.cursor()
-        # Se seleccionan todos los campos, incluyendo la contraseña hasheada
-        cursor.execute("SELECT user_ID, nombre, apellidos, dia, mes, anio, genero, actFisica, correo, contrasena FROM usuario WHERE correo=%s", (correo,))
-        user_data = cursor.fetchone()
-        
-        if user_data:
-            column_names = [i[0] for i in cursor.description]
-            # Convierte la tupla en un diccionario para fácil acceso
-            user_dict = {column_names[i]: user_data[i] for i in range(len(column_names))}
-            conn.close()
-            return user_dict
-        conn.close()
-        return None
-    except Exception:
-        # En caso de error de conexión o consulta
-        return None
 
 @app.route('/')
 def index():
@@ -100,11 +49,12 @@ def calculadora_imc():
 def calcular_imc():
     resultado = None
     if request.method == "POST":
-        try:
-            peso, estatura = float(request.form["peso"]), float(request.form["estatura"]) 
-            resultado = round(peso / ((estatura / 100) ** 2), 2)
-        except ValueError:
-            flash("Por favor, introduce números válidos para peso y estatura.", 'error')
+        peso = float(request.form["peso"])
+        estatura = float(request.form["estatura"]) 
+        # Pasar a metros
+        estatura_m = estatura / 100
+        # IMC = peso / (estatura_m * estatura_m)
+        resultado = round(peso / (estatura_m * estatura_m), 2)
     return render_template("calculadora_imc.html", resultado=resultado)
 
 @app.route('/basal')
@@ -167,15 +117,19 @@ def calculadora_macro():
 
 @app.route('/calcular_macro', methods=["POST"])
 def calcular_macro():
-    resultado = None
-    if "email" not in session: return redirect(url_for("sesion"))
-    try:
-        alimento = request.form["alimento"]
-        grasas, proteinas, carbohidratos = float(request.form["grasas"]), float(request.form["proteinas"]), float(request.form["carbohidratos"])
-        calorias_totales = (grasas * 9) + (proteinas * 4) + (carbohidratos * 4)
-        resultado = {"alimento": alimento, "grasas": grasas, "proteinas": proteinas, "carbohidratos": carbohidratos, "calorias_totales": round(calorias_totales, 2)}
-    except ValueError:
-        flash("Por favor, introduce números válidos para los macronutrientes.", 'error')
+    alimento = request.form["alimento"]
+    grasas = float(request.form["grasas"])
+    proteinas = float(request.form["proteinas"])
+    carbohidratos = float(request.form["carbohidratos"])
+
+    calorias_totales = (grasas * 9) + (proteinas * 4) + (carbohidratos * 4)
+    resultado = {
+        "alimento": alimento,
+        "grasas": grasas,
+        "proteinas": proteinas,
+        "carbohidratos": carbohidratos,
+        "calorias_totales": round(calorias_totales, 2)
+    }
     return render_template("calculadora_macro.html", resultado=resultado)
 
 # --- Búsqueda de Alimentos ---
@@ -229,40 +183,29 @@ def registrame():
         genero, actFisica = request.form["genero"], request.form["actFisica"] 
         email, contrasena, confirmar = request.form["email"], request.form["contrasena"], request.form["confirmar_contrasena"]
 
-        if contrasena != confirmar:
-            flash("La contraseña no coincide", 'warning')
-            return render_template("registro.html")
-
-        if obtener_usuario_por_email(email):
-            flash("El correo ya está registrado.", 'warning')
-            return render_template("registro.html")
-
-        hashed_password = generate_password_hash(contrasena)
-        
-        conn = mysql.connect()
-        cursor = conn.cursor()
-        cursor.execute('''
-            INSERT INTO usuario (nombre, apellidos, dia, mes, anio, genero, actFisica, correo, contrasena)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
-        ''', (nombre, apellidos, dia, mes, anio, genero, actFisica, email, hashed_password))
-        
-        conn.commit()
-        conn.close()
-        flash("Registro exitoso! Ya puedes iniciar sesión.", 'success')
-        return redirect(url_for("sesion"))
-    except Exception as e:
-        flash(f"Error al registrar usuario: {e}", 'error')
+    if contrasena != confirmar:
+        flash("La contraseña no coincide")
         return render_template("registro.html")
+    
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO usuario (nombre, apellidos, dia, mes, anio, genero, correo, contrasenia) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+        (nombre,apellidos,dia,mes,anio,genero,email,contrasena))
+    cursor.connection.commit()
+    flash("Registro exitoso!")
+    return redirect(url_for("sesion"))
 
 @app.route("/login", methods=["POST"])
 def login():
-    """Ruta para iniciar sesión verificando el hash seguro de la contraseña."""
-    email, contrasena_plana = request.form["email"], request.form["contrasena"] 
-    user = obtener_usuario_por_email(email)
-    
-    if user and check_password_hash(user['contrasena'], contrasena_plana):
-        session["email"], session["nombre"] = user['correo'], user['nombre']
-        flash("Sesión iniciada", 'success')
+    email = request.form["email"]
+    contrasena = request.form["contrasena"]
+
+    cursor = mysql.connect().cursor()
+    cursor.execute("SELECT * FROM usuario WHERE correo=%s AND contrasenia=%s",(email,contrasena))
+    user = cursor.fetchone()
+    if user:
+        session["email"] = email
+        flash("Sesión iniciada")
         return redirect(url_for("index"))
     else:
         flash("Usuario o contraseña incorrecta.", 'error')
@@ -270,61 +213,65 @@ def login():
 
 @app.route("/cerrar_sesion")
 def cerrar_sesion():
-    session.clear()  
-    flash("Sesión cerrada.", 'info')
+    session.clear() 
     return redirect(url_for("sesion"))
 
 @app.route("/cue", methods=["GET"])
 def cuenta():
-    """Muestra el formulario de cuenta con los datos actuales para su edición."""
-    if "email" not in session: return redirect(url_for("sesion"))
-    user = obtener_usuario_por_email(session['email'])
-    if user:
-        return render_template("cuentaUsuario.html", user=user)
-    flash("Error al cargar la información del usuario.", 'error')
-    return redirect(url_for("index"))
-    
-@app.route("/cuenta/actualizar", methods=["POST"])
-def actualizar_usuario():
-    """Actualiza los datos personales y/o la contraseña del usuario."""
+    return render_template("cuentaUsuario.html")
+
+@app.route("/search", methods=["GET", "POST"])
+def search_food_route():
     if "email" not in session:
         return redirect(url_for("sesion"))
+    
+    if request.method == "GET":
+        return render_template("buscar.html")
 
+    query = request.form.get("food_name", "").strip()
+    
+    if not query:
+        flash("Por favor ingresa un alimento para buscar.")
+        return render_template("buscar.html")
+    
     try:
-        nombre, apellidos = request.form["nombre"], request.form["apellidos"]
-        dia, mes, anio = int(request.form["dia"]), int(request.form["mes"]), int(request.form["anio"])
-        genero, actFisica = request.form["genero"], request.form["actFisica"] 
-        contrasena_nueva = request.form.get("contrasena_nueva", "").strip()
+        params = {
+            "api_key": USDA_API_KEY,
+            "query": query,
+            "pageSize": 3  
+        }
 
-        conn = mysql.connect()
-        cursor = conn.cursor()
+        response = requests.get(USDA_API_URL, params=params)
         
-        sql = """
-            UPDATE usuario SET 
-                nombre=%s, apellidos=%s, dia=%s, mes=%s, anio=%s, genero=%s, actFisica=%s
-            WHERE correo=%s
-        """
-        params = (nombre, apellidos, dia, mes, anio, genero, actFisica, session['email'])
-        
-        if contrasena_nueva:
-            hashed_password = generate_password_hash(contrasena_nueva)
-            sql = """
-                UPDATE usuario SET 
-                    nombre=%s, apellidos=%s, dia=%s, mes=%s, anio=%s, genero=%s, actFisica=%s, contrasena=%s
-                WHERE correo=%s
-            """
-            params = (nombre, apellidos, dia, mes, anio, genero, actFisica, hashed_password, session['email'])
+        if response.status_code == 200:
+            data = response.json()
+            foods = data.get("foods", [])
+            
+            if not foods:
+                flash(f"No se encontraron resultados para '{query}'.", "error")
+                return render_template("buscar.html")
 
-        cursor.execute(sql, params)
-        conn.commit()
-        conn.close()
-        
-        flash("Tus datos han sido actualizados exitosamente.", 'success')
-        return redirect(url_for("cuenta"))
+            results = []
+            for f in foods:
+                nutrients = {n["nutrientName"]: n.get("value") for n in f.get("foodNutrients", [])}
+                
+                results.append({
+                    "description": f.get("description", "Sin descripción"),
+                    "brand": f.get("brandName", "N/A"),
+                    "calories": nutrients.get("Energy", "N/A"),
+                    "protein": nutrients.get("Protein", "N/A"),
+                    "carbs": nutrients.get("Carbohydrate, by difference", "N/A"),
+                    "fat": nutrients.get("Total lipid (fat)", "N/A")
+                })
+            
+            return render_template("buscar_re.html", query=query, foods=results)
+        else:
+            flash(f"Error en la búsqueda: {response.status_code}", "error")
+            return render_template("buscar.html")
 
-    except Exception as e:
-        flash(f"Error al actualizar la información: {e}", 'error')
-        return redirect(url_for("cuenta"))
+    except requests.exceptions.RequestException as e:
+        flash(f"Error al conectarse con la API: {e}", "error")
+        return render_template("buscar.html")
 
 if __name__ == '__main__':
     app.run(debug=True)
