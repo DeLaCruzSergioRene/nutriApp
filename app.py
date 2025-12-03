@@ -227,7 +227,7 @@ def search_food():
             flash("¡Ups! Olvidaste escribir el nombre del alimento.", "warning")
             return redirect(url_for("search_food"))
         try:
-            params = {"api_key": "rfTd35c18oR2TY0uJOMRZpk6kPH9TsHy8Id90E3k", "query": query, "pageSize": 3}
+            params = {"api_key": "uUAHZrEBwGMCyT6DX0KvXV3trYIeLw9azDauRSTO", "query": query, "pageSize": 3}
             response = requests.get("https://api.nal.usda.gov/fdc/v1/foods/search", params=params)
             
             if response.status_code == 200:
