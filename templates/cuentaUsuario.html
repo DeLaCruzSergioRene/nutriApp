@@ -1,81 +1,130 @@
 {% extends "base.html" %}
-{% block title %}Mi Información - Solo Lectura{% endblock %}
-{% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <h1 class="text-center mb-5 text-dark fw-bold">
-            Tu Perfil Nutricional (Vista Estricta)
-        </h1>
-        <div class="card shadow-lg mb-4 border-primary">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Datos Personales y Contacto</h5>
-            </div>
-            <div class="card-body">
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <p class="mb-0 text-muted">Nombre Completo:</p>
-                        <p class="fs-5 fw-bold">{{ user.nombre }} {{ user.apellidos }}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <p class="mb-0 text-muted">Correo Electrónico:</p>
-                        <p class="fs-5 fw-bold">{{ user.correo }}</p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <p class="mb-0 text-muted">Fecha de Nacimiento:</p>
-                        <p class="fs-5 fw-bold">{{ user.dia }}/{{ user.mes }}/{{ user.anio }}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <p class="mb-0 text-muted">Actividad Física:</p>
-                        <p class="fs-5 fw-bold">
-                            {% if user.actFisica == 'Y' %}Sí{% else %}No{% endif %}
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
+{% block title %}Mi Cuenta{% endblock %}
 
-        <!-- CARD 2: Perfil Nutricional -->
-        <div class="card shadow-lg mb-4 border-success">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0">Perfil y Metas Nutricionales</h5>
-            </div>
-            <div class="card-body">
-                <div class="row mb-3">
-                    <div class="col-12">
-                        <p class="mb-0 text-muted">Objetivo Principal:</p>
-                        <p class="fs-5">{{ user.objetivo | default('No especificado') }}</p>
-                    </div>
-                </div>
-                <div class="row mb-3">
+{% block contenido %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <!-- Tarjeta principal para la vista de la cuenta -->
+        <div class="card shadow-lg p-4 mb-5 bg-white rounded-3">
+            <h1 class="card-title text-center text-success mb-4 fw-bold border-bottom pb-2">Mi Cuenta y Perfil Nutricional</h1>
+            
+            {% if user %}
+                <!-- Sección de visualización de datos actuales -->
+                <div class="row mb-4">
                     <div class="col-md-6">
-                        <p class="mb-0 text-muted">Tipo de Dieta:</p>
-                        <p class="fs-5">{{ user.dieta | default('General') }}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <p class="mb-0 text-muted">Género:</p>
-                        <!-- Muestra el texto completo basado en el ENUM (H/M/O/P) -->
-                        <p class="fs-5">
-                            {% if user.genero == 'H' %}Hombre
-                            {% elif user.genero == 'M' %}Mujer
-                            {% elif user.genero == 'O' %}Otro
-                            {% else %}Prefiero no decir
-                            {% endif %}
+                        <h3 class="text-success mb-3">Datos Personales</h3>
+                        <p><strong>ID de Usuario:</strong> <span class="badge bg-secondary">{{ user.user_ID }}</span></p>
+                        <p><strong>Nombre Completo:</strong> {{ user.nombre }} {{ user.apellidos }}</p>
+                        <p><strong>Correo Electrónico:</strong> {{ user.correo }}</p>
+                        <p><strong>Fecha de Nacimiento:</strong> {{ user.dia }}/{{ user.mes }}/{{ user.anio }}</p>
+                        <p><strong>Género:</strong> 
+                            {% if user.genero == 'H' %}Hombre{% elif user.genero == 'M' %}Mujer{% else %}Otro/Prefiero no decir{% endif %}
                         </p>
+                        <p><strong>Actividad Física:</strong> {% if user.actFisica == 'Y' %}Sí{% else %}No{% endif %}</p>
+                    </div>
+                    <div class="col-md-6 border-start">
+                        <h3 class="text-success mb-3">Perfil Nutricional Actual</h3>
+                        <!-- Se muestran los campos nutricionales -->
+                        <p><strong>Objetivo:</strong> {{ user.objetivo if user.objetivo else 'No especificado' }}</p>
+                        <p><strong>Tipo de Dieta:</strong> {{ user.dieta if user.dieta else 'No especificado' }}</p>
+                        <p><strong>Alergias/Restricciones:</strong> {{ user.alergias if user.alergias else 'Ninguna' }}</p>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-12">
-                        <p class="mb-0 text-muted">Alergias / Restricciones:</p>
-                        <p class="fs-5">{{ user.alergias | default('Ninguna') }}</p>
+
+                <hr class="my-4">
+                
+                <h2 class="text-center text-primary mb-4">Actualizar Información</h2>
+                <!-- Formulario para actualizar datos. Apunta a la ruta /cuenta/actualizar -->
+                <form action="{{ url_for('actualizar_usuario') }}" method="POST">
+                    
+                    <!-- Campos de nombre y apellidos -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="nombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" value="{{ user.nombre }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="apellidos" class="form-label">Apellidos</label>
+                            <input type="text" class="form-control" id="apellidos" name="apellidos" value="{{ user.apellidos }}" required>
+                        </div>
                     </div>
+                    
+                    <h5 class="mt-4 mb-3 text-muted">Fecha de Nacimiento</h5>
+                    <!-- Campos de fecha de nacimiento -->
+                    <div class="row">
+                        <div class="col-4 mb-3">
+                            <label for="dia" class="form-label">Día</label>
+                            <input type="number" class="form-control" id="dia" name="dia" value="{{ user.dia }}" min="1" max="31" required>
+                        </div>
+                        <div class="col-4 mb-3">
+                            <label for="mes" class="form-label">Mes</label>
+                            <input type="number" class="form-control" id="mes" name="mes" value="{{ user.mes }}" min="1" max="12" required>
+                        </div>
+                        <div class="col-4 mb-3">
+                            <label for="anio" class="form-label">Año</label>
+                            <input type="number" class="form-control" id="anio" name="anio" value="{{ user.anio }}" min="1900" max="2024" required>
+                        </div>
+                    </div>
+
+                    <!-- Campos de Género y Actividad Física -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="genero" class="form-label">Género</label>
+                            <select class="form-select" id="genero" name="genero" required>
+                                <option value="H" {% if user.genero == 'H' %}selected{% endif %}>Hombre</option>
+                                <option value="M" {% if user.genero == 'M' %}selected{% endif %}>Mujer</option>
+                                <option value="O" {% if user.genero == 'O' %}selected{% endif %}>Otro</option>
+                                <option value="P" {% if user.genero == 'P' %}selected{% endif %}>Prefiero no decir</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="actFisica" class="form-label">¿Haces actividad física?</label>
+                            <select class="form-select" id="actFisica" name="actFisica" required>
+                                <option value="Y" {% if user.actFisica == 'Y' %}selected{% endif %}>Sí</option>
+                                <option value="N" {% if user.actFisica == 'N' %}selected{% endif %}>No</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <h5 class="mt-4 mb-3 text-muted">Datos Nutricionales (Opcional)</h5>
+                    <!-- Campos nutricionales para actualizar -->
+                    <div class="mb-3">
+                        <label for="objetivo" class="form-label">Objetivo Nutricional (Ej: Pérdida de peso, Ganancia muscular)</label>
+                        <input type="text" class="form-control" id="objetivo" name="objetivo" value="{{ user.objetivo if user.objetivo else '' }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="dieta" class="form-label">Tipo de Dieta (Ej: Vegetariana, Keto, Mediterránea)</label>
+                        <input type="text" class="form-control" id="dieta" name="dieta" value="{{ user.dieta if user.dieta else '' }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="alergias" class="form-label">Alergias o Restricciones Alimentarias</label>
+                        <textarea class="form-control" id="alergias" name="alergias" rows="3">{{ user.alergias if user.alergias else '' }}</textarea>
+                    </div>
+
+                    <h5 class="mt-4 mb-3 text-danger">Cambiar Contraseña (Opcional)</h5>
+                    <!-- Campo para cambiar la contraseña, solo si se llena -->
+                    <div class="mb-3">
+                        <label for="contrasena_nueva" class="form-label">Nueva Contraseña (Déjalo vacío si no quieres cambiarla)</label>
+                        <input type="password" class="form-control" id="contrasena_nueva" name="contrasena_nueva">
+                    </div>
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-success btn-lg">Guardar Cambios</button>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-4">
+                    <a href="{{ url_for('cerrar_sesion') }}" class="btn btn-outline-secondary">Cerrar Sesión</a>
                 </div>
-            </div>
-        </div>
-        
-        <div class="alert alert-info text-center mt-4" role="alert">
-            Esta es una vista de solo lectura y no contiene elementos interactivos o enlaces.
+
+            {% else %}
+                <!-- Mensaje de error si no se encuentra el usuario -->
+                <div class="alert alert-danger text-center">
+                    <p class="mb-0">No se pudo cargar tu información. Por favor, <a href="{{ url_for('login') }}" class="alert-link">inicia sesión de nuevo</a>.</p>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
