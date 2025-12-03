@@ -14,7 +14,6 @@ DB_CONFIG = {
     'database': 'izakaya',
 }
 
-# Clave secreta OBLIGATORIA para el manejo de sesiones de Flask
 app.config["SECRET_KEY"] = "una_clave_secreta_muy_larga_y_dificil_de_adivinar"
 
 # --- FUNCIONES DE BASE DE DATOS ---
@@ -126,11 +125,8 @@ def nosotros():
 def datos():
     return render_template('usoDatos.html')
 
-# --- RUTAS DE CALCULADORAS ---
-
 @app.route('/masa')
 def calculadora_imc():
-    # Renderiza la plantilla para la calculadora de IMC
     return render_template('calculadora_imc.html')
 
 @app.route('/masa/calcular', methods=["GET", "POST"])
@@ -143,14 +139,11 @@ def calcular_imc():
             imc = peso / ((estatura / 100) ** 2)  # Fórmula para calcular el IMC
             resultado = round(imc, 2)  # Redondea el resultado a 2 decimales
         except ValueError:
-            # Si hay un error de conversión (no se ingresa un número válido), muestra un mensaje de error
             flash("Oye, asegúrate de poner solo números válidos para tu peso y estatura.", 'error')
-    # Retorna la plantilla con el resultado
     return render_template("calculadora_imc.html", resultado=resultado)
 
 @app.route('/basal')
 def calculadora_basal():
-    # Renderiza la plantilla para la calculadora de la tasa metabólica basal (TMB)
     return render_template('calculadora_basal.html')
 
 @app.route('/tmb', methods=["GET", "POST"])
@@ -167,14 +160,11 @@ def calcular_tmb():
                 resultado = 10 * peso + 6.25 * altura - 5 * edad - 161
             resultado = round(resultado, 2)  # Redondea el resultado a 2 decimales
         except ValueError:
-            # Si hay un error con los valores ingresados, muestra un mensaje de error
             flash("Necesitas ingresar valores numéricos válidos en todos los campos.", 'error')
-    # Retorna la plantilla con el resultado de la TMB
     return render_template("calculadora_basal.html", resultado=resultado)
 
 @app.route('/gasto')
 def calculadora_gasto():
-    # Renderiza la plantilla para la calculadora de gasto energético total (GET)
     return render_template('calculadora_gasto.html')
 
 @app.route('/gct', methods=["GET", "POST"])
@@ -188,12 +178,10 @@ def calculadora_gct():
         except ValueError:
             # Si los datos no son válidos, muestra un mensaje de error
             flash("Por favor, revisa que tus datos sean números válidos.", 'error')
-    # Retorna la plantilla con el resultado del GCT
     return render_template("calculadora_gasto.html", resultado=resultado)
 
 @app.route('/ideal')
 def calculadora_ideal():
-    # Renderiza la plantilla para la calculadora de peso ideal
     return render_template('calculadora_ideal.html')
 
 @app.route('/idea', methods=["GET", "POST"])
@@ -211,9 +199,7 @@ def calculadora_idea():
                 resultado = 45.5 + 0.91 * (altura - 152)
             resultado = round(resultado, 2)  # Redondea el resultado a 2 decimales
         except ValueError:
-            # Si hay un error con la altura, muestra un mensaje de error
             flash("Recuerda usar solo números para la altura.", 'error')
-    # Retorna la plantilla con el resultado del peso ideal
     return render_template("calculadora_ideal.html", resultado=resultado)
 
 @app.route('/macro')
@@ -221,7 +207,6 @@ def calculadora_macro():
     # Verifica que el usuario esté logueado antes de acceder a la calculadora de macros
     if "email" not in session: 
         return redirect(url_for("sesion"))
-    # Renderiza la plantilla para calcular macros
     return render_template('calculadora_macro.html')
 
 @app.route('/calcular_macro', methods=["POST"])
@@ -243,9 +228,7 @@ def calcular_macro():
             "calorias_totales": round(calorias_totales, 2)  # Redondea las calorías totales
         }
     except ValueError:
-        # Si hay un error con los valores de los macronutrientes, muestra un mensaje de error
         flash("Asegúrate de que los valores de macronutrientes sean números.", 'error')
-    # Retorna la plantilla con el resultado de los macronutrientes y calorías totales
     return render_template("calculadora_macro.html", resultado=resultado)
 
 @app.route("/search", methods=["GET", "POST"])
@@ -427,10 +410,10 @@ def actualizar_usuario():
         conn.commit()
         
         flash("¡Perfecto! Tus datos han sido actualizados.", 'success')
-        return redirect(url_for("cuenta")) # Redirección consistente a /cue
+        return redirect(url_for("cuenta"))
     except Exception as e:
         flash(f"No pudimos actualizar tu información. Revisa tus datos. Error: {e}", 'error')
-        return redirect(url_for("cuenta")) # Redirección consistente a /cue
+        return redirect(url_for("cuenta"))
     finally:
         if conn and conn.is_connected():
             if cursor: cursor.close()
